@@ -31,14 +31,15 @@ There are 2 Semaphore groups to achieve the anonymous of seller and buyer.
 
 ### Smart Contract
 
-There should be mainly 4 functions and 2 groups above in the smart contract
+There should be mainly 6 functions and 2 groups above in the smart contract
 functions
 
 1. listNFT(): called by seller
-2. depositETH(): called by buyer
-3. withdrawETH(): called by buyer to withdraw unspent ETH
-4. buyAndClaimNFT(): can be called by anyone, triggered by buyer
-5. claimETH(): can be called by anyone, triggered by seller
+1. depositETH(): called by buyer
+1. buyAndClaimNFT(): can be called by anyone, triggered by buyer
+1. claimETH(): can be called by anyone, triggered by seller
+1. withdrawETH(): called by buyer to withdraw unspent ETH
+1. delistNFT(): called by seller to delist unsold NFT
 
 ## Transaction flow
 
