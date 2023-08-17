@@ -2,6 +2,8 @@ import { HardhatUserConfig } from 'hardhat/config'
 import { join } from 'path'
 import dotenv from 'dotenv'
 import '@nomicfoundation/hardhat-toolbox'
+import '@semaphore-protocol/hardhat'
+import '@typechain/hardhat'
 
 dotenv.config({ path: join(process.cwd(), '../.env') })
 

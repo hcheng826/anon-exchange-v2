@@ -2,10 +2,11 @@
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
+import '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
 import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import '@semaphore-protocol/contracts/interfaces/ISemaphore.sol';
 
-contract AnonExchange is ReentrancyGuard {
+contract AnonExchange is ReentrancyGuard, IERC721Receiver {
   ISemaphore public semaphore;
 
   uint public constant NFT_SOLD_SELLER_GROUP_ID = 1;
@@ -42,7 +43,12 @@ contract AnonExchange is ReentrancyGuard {
   // depositor addr -> identity
   mapping(address => uint) public ethDepositRecords;
 
-  function depositNFT(address nftAddress, uint256 tokenId, uint256 identityCommitment) external nonReentrant {
+  function onERC721Received(address, address, uint256, bytes calldata) external pure override returns (bytes4) {
+    // bytes4(keccak256('onERC721Received(address,address,uint256,bytes)'))
+    return 0x150b7a02;
+  }
+
+  function listNFT(address nftAddress, uint256 tokenId, uint256 identityCommitment) external nonReentrant {
     IERC721(nftAddress).safeTransferFrom(msg.sender, address(this), tokenId);
     nftListingRecords[nftAddress][tokenId] = ListNFTRecord({sellerAddr: msg.sender, idCommitment: identityCommitment});
   }
