@@ -39,10 +39,6 @@ contract AnonExchange is ReentrancyGuard, IERC721Receiver {
   // nft contract addr -> tokenId -> idcommitment/holder addr
   mapping(address => mapping(uint256 => ListNFTRecord)) public nftListingRecords;
 
-  // Mapping of user identityCommitments to their ETH deposit status
-  // depositor addr -> identity
-  mapping(address => uint) public ethDepositRecords;
-
   function onERC721Received(address, address, uint256, bytes calldata) external pure override returns (bytes4) {
     // bytes4(keccak256('onERC721Received(address,address,uint256,bytes)'))
     return 0x150b7a02;
@@ -63,19 +59,11 @@ contract AnonExchange is ReentrancyGuard, IERC721Receiver {
 
   function depositETH(uint256 identityCommitment) external payable nonReentrant {
     if (msg.value != 0.1 ether) revert InvalidDepositAmount();
-    if (ethDepositRecords[msg.sender] != 0) revert AlreadyDeposited();
-
-    ethDepositRecords[msg.sender] = identityCommitment;
     semaphore.addMember(ETH_DEPOSITED_BUYER_GROUP_ID, identityCommitment);
   }
 
-  // Original depositer can withdraw the NFT before it's spent
-  // (Note: could also make withdraw unspent ETH anonymous.Then deposit and withdraw itself becomes tornado)
-  function withdrawETH(uint256 merkleTreeRoot, uint256 nullifierHash, uint256[8] calldata proof) external nonReentrant {
-    if (ethDepositRecords[msg.sender] == 0) revert NoDeposit();
-
-    ethDepositRecords[msg.sender] = 0;
-
+  // ETH depositer can withdraw ETH before it's spent
+  function withdrawETH(uint256 merkleTreeRoot, uint256 nullifierHash, uint256[8] calldata proof, address ethRecipient) external nonReentrant {
     semaphore.verifyProof(
       ETH_DEPOSITED_BUYER_GROUP_ID,
       merkleTreeRoot,
@@ -85,7 +73,7 @@ contract AnonExchange is ReentrancyGuard, IERC721Receiver {
       proof
     );
 
-    (bool success, ) = msg.sender.call{value: 0.1 ether}('');
+    (bool success, ) = ethRecipient.call{value: 0.1 ether}('');
     if (!success) revert EthTransferFailed();
   }
 
