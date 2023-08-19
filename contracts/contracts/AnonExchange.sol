@@ -70,7 +70,7 @@ contract AnonExchange is ReentrancyGuard, IERC721Receiver {
   }
 
   // Original depositer can withdraw the NFT before it's spent
-  // (Note: could also make withdraw unspent ETH anonymous. deposit and withdraw itself becomes tornado)
+  // (Note: could also make withdraw unspent ETH anonymous.Then deposit and withdraw itself becomes tornado)
   function withdrawETH(uint256 merkleTreeRoot, uint256 nullifierHash, uint256[8] calldata proof) external nonReentrant {
     if (ethDepositRecords[msg.sender] == 0) revert NoDeposit();
 
@@ -101,9 +101,6 @@ contract AnonExchange is ReentrancyGuard, IERC721Receiver {
     if (nftListingRecords[nftAddr][tokenId].sellerAddr == address(0) || nftListingRecords[nftAddr][tokenId].idCommitment == 0)
       revert NftNotAvailable();
 
-    // clear the NFT listing record
-    nftListingRecords[nftAddr][tokenId] = ListNFTRecord({sellerAddr: address(0), idCommitment: 0});
-
     // update semaphore
     semaphore.verifyProof(
       ETH_DEPOSITED_BUYER_GROUP_ID,
@@ -114,6 +111,9 @@ contract AnonExchange is ReentrancyGuard, IERC721Receiver {
       proof
     );
     semaphore.addMember(NFT_SOLD_SELLER_GROUP_ID, nftListingRecords[nftAddr][tokenId].idCommitment);
+
+    // clear the NFT listing record
+    nftListingRecords[nftAddr][tokenId] = ListNFTRecord({sellerAddr: address(0), idCommitment: 0});
 
     // transfer NFT
     IERC721(nftAddr).safeTransferFrom(address(this), nftRecipient, tokenId);

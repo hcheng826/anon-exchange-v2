@@ -73,7 +73,7 @@ describe('anonExchange', () => {
 
   it('buyer can buy and claim NFT', async () => {
     const tokenId = 0
-    const nftRecipient = accounts[2].address
+    const nftRecipient = accounts[2]
     const fullProof = await generateProof(buyerIdentity, ethDepositedGroup, ethDepositedGroup.id, BUYER_BUY_AND_CLAIM_NFT_SIGNAL, {
       wasmFilePath,
       zkeyFilePath,
@@ -81,27 +81,25 @@ describe('anonExchange', () => {
 
     await anonExchange
       .connect(accounts[0])
-      .buyAndClaimNFT(simpleNFT.address, tokenId, fullProof.merkleTreeRoot, fullProof.nullifierHash, fullProof.proof, nftRecipient)
+      .buyAndClaimNFT(simpleNFT.address, tokenId, fullProof.merkleTreeRoot, fullProof.nullifierHash, fullProof.proof, nftRecipient.address)
 
     nftSoldGroup.addMember(sellerIdentity.commitment)
 
-    expect(await simpleNFT.ownerOf(tokenId)).to.equal(nftRecipient)
+    expect(await simpleNFT.ownerOf(tokenId)).to.equal(nftRecipient.address)
   })
 
-  it.skip('NFT seller can claim ETH after NFT sold', async () => {
-    const initialBalance = await accounts[1].getBalance()
-
+  it('NFT seller can claim ETH after NFT sold', async () => {
+    const ethRecipient = accounts[3]
+    const initBalance = await ethRecipient.getBalance()
     const fullProof = await generateProof(sellerIdentity, nftSoldGroup, nftSoldGroup.id, SELLER_CLAIM_ETH_SIGNAL, {
       wasmFilePath,
       zkeyFilePath,
     })
 
-    console.log(fullProof)
+    await anonExchange.connect(accounts[0]).claimETH(ethRecipient.address, fullProof.merkleTreeRoot, fullProof.nullifierHash, fullProof.proof)
 
-    await anonExchange.connect(accounts[1]).claimETH(accounts[1].address, fullProof.merkleTreeRoot, fullProof.nullifierHash, fullProof.proof)
-
-    const finalBalance = await accounts[1].getBalance()
-    expect(finalBalance.sub(initialBalance)).to.closeTo(ethers.utils.parseEther('0.1'), ethers.utils.parseEther('0.001'))
+    const finalBalance = await ethRecipient.getBalance()
+    expect(finalBalance.sub(initBalance)).to.eq(ethers.utils.parseEther('0.1'))
   })
 
   // TODO: Add more tests for each function in the contract
