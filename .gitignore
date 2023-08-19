@@ -53,3 +53,5 @@ contracts/artifacts
 # subgraph
 subgraph/node_modules
 subgraph/build
+
+snark-artifacts

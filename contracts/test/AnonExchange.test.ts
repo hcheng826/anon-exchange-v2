@@ -5,7 +5,7 @@ import { Identity } from '@semaphore-protocol/identity'
 import { generateProof } from '@semaphore-protocol/proof'
 import { Group } from '@semaphore-protocol/group'
 import { AnonExchange, SimpleNFT, ISemaphore } from '../typechain-types'
-import path from 'path'
+import { config } from '../package.json'
 
 describe('anonExchange', () => {
   let semaphore: ISemaphore
@@ -26,8 +26,8 @@ describe('anonExchange', () => {
   const nftSoldGroup = new Group(NFT_SOLD_GROUP_ID, 20)
   const ethDepositedGroup = new Group(ETH_DEPOSITED_GROUP_ID, 20)
 
-  const wasmFilePath = path.join(__dirname, './semaphore/semaphore.wasm')
-  const zkeyFilePath = path.join(__dirname, './semaphore/semaphore.zkey')
+  const wasmFilePath = `${config.paths['snark-artifacts']}/semaphore.wasm`
+  const zkeyFilePath = `${config.paths['snark-artifacts']}/semaphore.zkey`
 
   before(async () => {
     const anonExchangeFactory = await ethers.getContractFactory('AnonExchange')
