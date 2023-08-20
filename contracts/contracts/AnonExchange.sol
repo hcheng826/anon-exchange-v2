@@ -20,7 +20,7 @@ contract AnonExchange is IERC721Receiver {
     uint idCommitment;
   }
 
-  error CallerInvalidOrNftNotDeposit();
+  error CallerInvalidOrNftNotAvailable();
   error InvalidDepositAmount();
   error AlreadyDeposited();
   error NoDeposit();
@@ -49,9 +49,9 @@ contract AnonExchange is IERC721Receiver {
     nftListingRecords[nftAddress][tokenId] = ListNFTRecord({sellerAddr: msg.sender, idCommitment: identityCommitment});
   }
 
-  // Original NFT lister can withdraw the NFT before it's sold
-  function withdrawNFT(address nftAddress, uint256 tokenId) external {
-    if (nftListingRecords[nftAddress][tokenId].sellerAddr != msg.sender) revert CallerInvalidOrNftNotDeposit();
+  // Original NFT lister can delist the NFT before it's sold
+  function delistNFT(address nftAddress, uint256 tokenId) external {
+    if (nftListingRecords[nftAddress][tokenId].sellerAddr != msg.sender) revert CallerInvalidOrNftNotAvailable();
 
     nftListingRecords[nftAddress][tokenId] = ListNFTRecord({sellerAddr: address(0), idCommitment: 0});
     IERC721(nftAddress).safeTransferFrom(address(this), msg.sender, tokenId);

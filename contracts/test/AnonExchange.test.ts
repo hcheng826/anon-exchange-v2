@@ -104,7 +104,7 @@ describe('anonExchange', () => {
     expect(finalBalance.sub(initBalance)).to.eq(ethers.utils.parseEther('0.1'))
   })
 
-  it('seller can list NFT and withdraw NFT', async () => {
+  it('seller can list NFT and delist NFT', async () => {
     const tokenId = await simpleNFT._tokenIdCounter()
     await simpleNFT.connect(deployer).safeMint(accounts[0].address)
     await simpleNFT.connect(accounts[0]).approve(anonExchange.address, tokenId)
@@ -115,7 +115,7 @@ describe('anonExchange', () => {
     expect(nftListing.sellerAddr).to.equal(accounts[0].address)
     expect(nftListing.idCommitment.toString()).to.equal(sellerIdentity.commitment.toString())
 
-    await anonExchange.connect(accounts[0]).withdrawNFT(simpleNFT.address, tokenId)
+    await anonExchange.connect(accounts[0]).delistNFT(simpleNFT.address, tokenId)
     const nftListing2 = await anonExchange.nftListingRecords(simpleNFT.address, tokenId)
     expect(nftListing2.sellerAddr).to.equal(ethers.constants.AddressZero)
     expect(nftListing2.idCommitment.toString()).to.equal('0')
@@ -241,7 +241,7 @@ describe('anonExchange', () => {
   })
 
   // AnonExchange reverts
-  it('withdrawNFT reverted if not called by lister', async () => {
+  it('delistNFT reverted if not called by lister', async () => {
     const tokenId = await simpleNFT._tokenIdCounter()
     await simpleNFT.connect(deployer).safeMint(accounts[0].address)
     await simpleNFT.connect(accounts[0]).approve(anonExchange.address, tokenId)
@@ -252,9 +252,9 @@ describe('anonExchange', () => {
     expect(nftListing.sellerAddr).to.equal(accounts[0].address)
     expect(nftListing.idCommitment.toString()).to.equal(sellerIdentity.commitment.toString())
 
-    await expect(anonExchange.connect(accounts[1]).withdrawNFT(simpleNFT.address, tokenId)).to.be.revertedWithCustomError(
+    await expect(anonExchange.connect(accounts[1]).delistNFT(simpleNFT.address, tokenId)).to.be.revertedWithCustomError(
       anonExchange,
-      'CallerInvalidOrNftNotDeposit'
+      'CallerInvalidOrNftNotAvailable'
     )
   })
 
