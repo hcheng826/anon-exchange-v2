@@ -43,12 +43,13 @@ contract AnonExchange is IERC721Receiver {
     return 0x150b7a02;
   }
 
+  // call by NFT seller
   function listNFT(address nftAddress, uint256 tokenId, uint256 identityCommitment) external {
     IERC721(nftAddress).safeTransferFrom(msg.sender, address(this), tokenId);
     nftListingRecords[nftAddress][tokenId] = ListNFTRecord({sellerAddr: msg.sender, idCommitment: identityCommitment});
   }
 
-  // Original depositer can withdraw the NFT before it's sold
+  // Original NFT lister can withdraw the NFT before it's sold
   function withdrawNFT(address nftAddress, uint256 tokenId) external {
     if (nftListingRecords[nftAddress][tokenId].sellerAddr != msg.sender) revert CallerInvalidOrNftNotDeposit();
 
@@ -56,12 +57,14 @@ contract AnonExchange is IERC721Receiver {
     IERC721(nftAddress).safeTransferFrom(address(this), msg.sender, tokenId);
   }
 
+  // call by potential buyer
   function depositETH(uint256 identityCommitment) external payable {
     if (msg.value != 0.1 ether) revert InvalidDepositAmount();
     semaphore.addMember(ETH_DEPOSITED_BUYER_GROUP_ID, identityCommitment);
   }
 
   // ETH depositer can withdraw ETH before it's spent
+  // Can be called by any address with proof after ETH is deposited
   function withdrawETH(uint256 merkleTreeRoot, uint256 nullifierHash, uint256[8] calldata proof, address ethRecipient) external {
     semaphore.verifyProof(
       ETH_DEPOSITED_BUYER_GROUP_ID,
@@ -76,7 +79,7 @@ contract AnonExchange is IERC721Receiver {
     if (!success) revert EthTransferFailed();
   }
 
-  // triggered by NFT buyer, who has deposited ETH
+  // Can be called by any address with proof after ETH is deposited
   function buyAndClaimNFT(
     address nftAddr,
     uint tokenId,
@@ -105,7 +108,7 @@ contract AnonExchange is IERC721Receiver {
     IERC721(nftAddr).safeTransferFrom(address(this), nftRecipient, tokenId);
   }
 
-  // triggered by NFT seller, can call after NFT is sold
+  // Can be called by any address with proof after NFT is sold
   function claimETH(address ethRecipient, uint256 merkleTreeRoot, uint256 nullifierHash, uint256[8] calldata proof) external {
     semaphore.verifyProof(NFT_SOLD_SELLER_GROUP_ID, merkleTreeRoot, SELLER_CLAIM_ETH_SIGNAL, nullifierHash, NFT_SOLD_SELLER_GROUP_ID, proof);
 

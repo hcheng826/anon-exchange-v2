@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "hardhat compile",
+    "download:snark-artifacts": "npx hardhat run scripts/download-snark-artifacts.ts",
     "deploy": "npx hardhat run scripts/deploy.ts",
     "deploy:nft": "npx hardhat run scripts/nft.ts",
     "coverage": "hardhat coverage",

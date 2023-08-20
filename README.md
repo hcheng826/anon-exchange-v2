@@ -65,8 +65,22 @@ Note that transaction for buying NFT and claiming ETH can be sent from any addre
 
 ## Development 🛠️
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+### Smart Contracts
+
+1. Go to `contracts/`
+2. Install dependencies
+   ```bash
+   yarn
+   ```
+3. Set up snark files
+   ```bash
+   yarn download:snark-artifacts
+   ```
+4. Run test
+   ```bash
+   yarn test
+   ```
+5. Coverage
+   ```bash
+   yarn coverage
+   ```
