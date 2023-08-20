@@ -3,10 +3,9 @@ pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
-import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import '@semaphore-protocol/contracts/interfaces/ISemaphore.sol';
 
-contract AnonExchange is ReentrancyGuard, IERC721Receiver {
+contract AnonExchange is IERC721Receiver {
   ISemaphore public semaphore;
 
   uint public constant NFT_SOLD_SELLER_GROUP_ID = 1;
@@ -44,26 +43,26 @@ contract AnonExchange is ReentrancyGuard, IERC721Receiver {
     return 0x150b7a02;
   }
 
-  function listNFT(address nftAddress, uint256 tokenId, uint256 identityCommitment) external nonReentrant {
+  function listNFT(address nftAddress, uint256 tokenId, uint256 identityCommitment) external {
     IERC721(nftAddress).safeTransferFrom(msg.sender, address(this), tokenId);
     nftListingRecords[nftAddress][tokenId] = ListNFTRecord({sellerAddr: msg.sender, idCommitment: identityCommitment});
   }
 
   // Original depositer can withdraw the NFT before it's sold
-  function withdrawNFT(address nftAddress, uint256 tokenId) external nonReentrant {
+  function withdrawNFT(address nftAddress, uint256 tokenId) external {
     if (nftListingRecords[nftAddress][tokenId].sellerAddr != msg.sender) revert CallerInvalidOrNftNotDeposit();
 
-    IERC721(nftAddress).safeTransferFrom(address(this), msg.sender, tokenId);
     nftListingRecords[nftAddress][tokenId] = ListNFTRecord({sellerAddr: address(0), idCommitment: 0});
+    IERC721(nftAddress).safeTransferFrom(address(this), msg.sender, tokenId);
   }
 
-  function depositETH(uint256 identityCommitment) external payable nonReentrant {
+  function depositETH(uint256 identityCommitment) external payable {
     if (msg.value != 0.1 ether) revert InvalidDepositAmount();
     semaphore.addMember(ETH_DEPOSITED_BUYER_GROUP_ID, identityCommitment);
   }
 
   // ETH depositer can withdraw ETH before it's spent
-  function withdrawETH(uint256 merkleTreeRoot, uint256 nullifierHash, uint256[8] calldata proof, address ethRecipient) external nonReentrant {
+  function withdrawETH(uint256 merkleTreeRoot, uint256 nullifierHash, uint256[8] calldata proof, address ethRecipient) external {
     semaphore.verifyProof(
       ETH_DEPOSITED_BUYER_GROUP_ID,
       merkleTreeRoot,
@@ -85,9 +84,8 @@ contract AnonExchange is ReentrancyGuard, IERC721Receiver {
     uint256 nullifierHash,
     uint256[8] calldata proof,
     address nftRecipient
-  ) external nonReentrant {
-    if (nftListingRecords[nftAddr][tokenId].sellerAddr == address(0) || nftListingRecords[nftAddr][tokenId].idCommitment == 0)
-      revert NftNotAvailable();
+  ) external {
+    if (nftListingRecords[nftAddr][tokenId].sellerAddr == address(0)) revert NftNotAvailable();
 
     // update semaphore
     semaphore.verifyProof(
@@ -108,7 +106,7 @@ contract AnonExchange is ReentrancyGuard, IERC721Receiver {
   }
 
   // triggered by NFT seller, can call after NFT is sold
-  function claimETH(address ethRecipient, uint256 merkleTreeRoot, uint256 nullifierHash, uint256[8] calldata proof) external nonReentrant {
+  function claimETH(address ethRecipient, uint256 merkleTreeRoot, uint256 nullifierHash, uint256[8] calldata proof) external {
     semaphore.verifyProof(NFT_SOLD_SELLER_GROUP_ID, merkleTreeRoot, SELLER_CLAIM_ETH_SIGNAL, nullifierHash, NFT_SOLD_SELLER_GROUP_ID, proof);
 
     (bool success, ) = ethRecipient.call{value: 0.1 ether}('');

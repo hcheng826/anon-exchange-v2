@@ -65,10 +65,10 @@ describe('anonExchange', () => {
     const depositAmount = ethers.utils.parseEther('0.1')
 
     const contractBalBefore = await ethers.provider.getBalance(anonExchange.address)
-    await anonExchange.connect(accounts[1]).depositETH(sellerIdentity.commitment, {
+    await anonExchange.connect(accounts[1]).depositETH(buyerIdentity.commitment, {
       value: depositAmount,
     })
-    ethDepositedGroup.addMember(sellerIdentity.commitment)
+    ethDepositedGroup.addMember(buyerIdentity.commitment)
     const contractBalAfter = await ethers.provider.getBalance(anonExchange.address)
 
     expect(contractBalAfter.sub(contractBalBefore)).eq(depositAmount)
@@ -76,7 +76,7 @@ describe('anonExchange', () => {
 
   it('buyer can buy and claim NFT', async () => {
     const nftRecipient = accounts[2]
-    const fullProof = await generateProof(sellerIdentity, ethDepositedGroup, ethDepositedGroup.id, BUYER_BUY_AND_CLAIM_NFT_SIGNAL, {
+    const fullProof = await generateProof(buyerIdentity, ethDepositedGroup, ethDepositedGroup.id, BUYER_BUY_AND_CLAIM_NFT_SIGNAL, {
       wasmFilePath,
       zkeyFilePath,
     })
@@ -235,10 +235,147 @@ describe('anonExchange', () => {
       .connect(accounts[0])
       .claimETH(accounts[0].address, fullProofSell.merkleTreeRoot, fullProofSell.nullifierHash, fullProofSell.proof)
 
-    console.log(237)
-
     await expect(
       anonExchange.connect(accounts[0]).claimETH(accounts[0].address, fullProofSell.merkleTreeRoot, fullProofSell.nullifierHash, fullProofSell.proof)
     ).to.be.revertedWithCustomError(semaphore, 'Semaphore__YouAreUsingTheSameNillifierTwice')
+  })
+
+  // AnonExchange reverts
+  it('withdrawNFT reverted if not called by lister', async () => {
+    const tokenId = await simpleNFT._tokenIdCounter()
+    await simpleNFT.connect(deployer).safeMint(accounts[0].address)
+    await simpleNFT.connect(accounts[0]).approve(anonExchange.address, tokenId)
+
+    await anonExchange.connect(accounts[0]).listNFT(simpleNFT.address, tokenId, sellerIdentity.commitment)
+
+    const nftListing = await anonExchange.nftListingRecords(simpleNFT.address, tokenId)
+    expect(nftListing.sellerAddr).to.equal(accounts[0].address)
+    expect(nftListing.idCommitment.toString()).to.equal(sellerIdentity.commitment.toString())
+
+    await expect(anonExchange.connect(accounts[1]).withdrawNFT(simpleNFT.address, tokenId)).to.be.revertedWithCustomError(
+      anonExchange,
+      'CallerInvalidOrNftNotDeposit'
+    )
+  })
+
+  it('depositETH reverted if value not 0.1 ethers', async () => {
+    const depositAmount = ethers.utils.parseEther('0.2')
+
+    await ethers.provider.getBalance(anonExchange.address)
+    await expect(
+      anonExchange.connect(accounts[1]).depositETH(buyerIdentity.commitment, {
+        value: depositAmount,
+      })
+    ).to.be.revertedWithCustomError(anonExchange, 'InvalidDepositAmount')
+  })
+
+  it('EthTransferFailed if withdraw to address that cannot receive eth (withdrawETH)', async () => {
+    const depositAmount = ethers.utils.parseEther('0.1')
+    const depositIdentity = new Identity()
+
+    await anonExchange.connect(accounts[1]).depositETH(depositIdentity.commitment, {
+      value: depositAmount,
+    })
+    ethDepositedGroup.addMember(depositIdentity.commitment)
+
+    depositETHProof = await generateProof(depositIdentity, ethDepositedGroup, ethDepositedGroup.id, BUYER_WITHDRAW_UNSPENT_ETH_SIGNAL, {
+      wasmFilePath,
+      zkeyFilePath,
+    })
+
+    await ethers.provider.getBalance(accounts[4].address)
+
+    const cantReceiveEthContract = await (await ethers.getContractFactory('CannotReceiveEthContract')).deploy()
+
+    await expect(
+      anonExchange
+        .connect(accounts[1])
+        .withdrawETH(depositETHProof.merkleTreeRoot, depositETHProof.nullifierHash, depositETHProof.proof, cantReceiveEthContract.address)
+    ).to.be.revertedWithCustomError(anonExchange, 'EthTransferFailed')
+  })
+
+  it('EthTransferFailed if withdraw to address that cannot receive eth (claimETH)', async () => {
+    const tokenId = await simpleNFT._tokenIdCounter()
+    await simpleNFT.connect(deployer).safeMint(accounts[0].address)
+    await simpleNFT.connect(accounts[0]).approve(anonExchange.address, tokenId)
+
+    const sellerIdentity = new Identity()
+    await anonExchange.connect(accounts[0]).listNFT(simpleNFT.address, tokenId, sellerIdentity.commitment)
+
+    const depositAmount = ethers.utils.parseEther('0.1')
+    const depositIdentity = new Identity()
+
+    await anonExchange.connect(accounts[1]).depositETH(depositIdentity.commitment, {
+      value: depositAmount,
+    })
+    ethDepositedGroup.addMember(depositIdentity.commitment)
+
+    const fullProofBuy = await generateProof(depositIdentity, ethDepositedGroup, ethDepositedGroup.id, BUYER_BUY_AND_CLAIM_NFT_SIGNAL, {
+      wasmFilePath,
+      zkeyFilePath,
+    })
+
+    await anonExchange
+      .connect(accounts[1])
+      .buyAndClaimNFT(simpleNFT.address, tokenId, fullProofBuy.merkleTreeRoot, fullProofBuy.nullifierHash, fullProofBuy.proof, accounts[2].address)
+
+    nftSoldGroup.addMember(sellerIdentity.commitment)
+
+    const fullProofSell = await generateProof(sellerIdentity, nftSoldGroup, nftSoldGroup.id, SELLER_CLAIM_ETH_SIGNAL, {
+      wasmFilePath,
+      zkeyFilePath,
+    })
+
+    const cantReceiveEthContract = await (await ethers.getContractFactory('CannotReceiveEthContract')).deploy()
+
+    await expect(
+      anonExchange
+        .connect(accounts[0])
+        .claimETH(cantReceiveEthContract.address, fullProofSell.merkleTreeRoot, fullProofSell.nullifierHash, fullProofSell.proof)
+    ).to.be.revertedWithCustomError(anonExchange, 'EthTransferFailed')
+  })
+
+  it('EthTransferFailed if withdraw to address that cannot receive eth (claimETH)', async () => {
+    const tokenId = await simpleNFT._tokenIdCounter()
+    await simpleNFT.connect(deployer).safeMint(accounts[0].address)
+    await simpleNFT.connect(accounts[0]).approve(anonExchange.address, tokenId)
+
+    const sellerIdentity = new Identity()
+    await anonExchange.connect(accounts[0]).listNFT(simpleNFT.address, tokenId, sellerIdentity.commitment)
+
+    const depositAmount = ethers.utils.parseEther('0.1')
+    const depositIdentity = new Identity()
+
+    await anonExchange.connect(accounts[1]).depositETH(depositIdentity.commitment, {
+      value: depositAmount,
+    })
+    ethDepositedGroup.addMember(depositIdentity.commitment)
+
+    const fullProofBuy = await generateProof(depositIdentity, ethDepositedGroup, ethDepositedGroup.id, BUYER_BUY_AND_CLAIM_NFT_SIGNAL, {
+      wasmFilePath,
+      zkeyFilePath,
+    })
+
+    await expect(
+      anonExchange.connect(accounts[1]).buyAndClaimNFT(
+        simpleNFT.address,
+        tokenId.add(1), // invalid tokenId
+        fullProofBuy.merkleTreeRoot,
+        fullProofBuy.nullifierHash,
+        fullProofBuy.proof,
+        accounts[2].address
+      )
+    ).to.be.revertedWithCustomError(anonExchange, 'NftNotAvailable')
+
+    // nftSoldGroup.addMember(sellerIdentity.commitment)
+
+    // const fullProofSell = await generateProof(sellerIdentity, nftSoldGroup, nftSoldGroup.id, SELLER_CLAIM_ETH_SIGNAL, {
+    //   wasmFilePath,
+    //   zkeyFilePath,
+    // })
+
+    // await expect(
+    //   anonExchange.connect(accounts[0]).claimETH(accounts[5].address, fullProofSell.merkleTreeRoot, fullProofSell.nullifierHash, fullProofSell.proof)
+    // ).to.be.revertedWithCustomError(anonExchange, 'EthTransferFailed')
   })
 })
