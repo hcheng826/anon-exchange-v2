@@ -44,12 +44,12 @@ There are mainly 6 functions
 
 ### Sellers Lists NFT
 
-When seller lists the NFT on the exchange, a Semaphore identity is generated. Seller needs to note down the private Semaphore id. The smart contract will record the NFT with the corresponding public Semaphore id.
+When seller lists the NFT on the exchange, a Semaphore identity is generated. Seller needs to note down the private Semaphore id (trapdoor and nullifier). The smart contract will record the NFT with the corresponding public Semaphore id.
 ![AnonEx-list nft](https://github.com/hcheng826/anon-exchange/assets/23033847/44edefc4-676e-40db-8a66-7e705b28720b)
 
 ### Buyers Deposits ETH
 
-Buyer needs to deposit ETH before it can buy NFT. When buyer deposits, a Semaphore id is generated. Buyer needs to note down the private id. The smart contract will add the public id into `ETH_DEPOSITED_BUYER_GROUP_ID`.
+Buyer needs to deposit ETH before it can buy NFT. When buyer deposits, a Semaphore id is generated. Buyer needs to note down the private id (trapdoor and nullifier). The smart contract will add the public id into `ETH_DEPOSITED_BUYER_GROUP_ID`.
 ![AnonEx-deposit-eth](https://github.com/hcheng826/anon-exchange/assets/23033847/129d8ef0-b782-4052-a0c5-f693b449bbef)
 
 ### Buyer Purchases NFT
