@@ -5,8 +5,7 @@
   "scripts": {
     "build": "hardhat compile",
     "download:snark-artifacts": "npx hardhat run scripts/download-snark-artifacts.ts",
-    "deploy": "npx hardhat run scripts/deploy.ts",
-    "deploy:nft": "npx hardhat run scripts/nft.ts",
+    "deploy:local": "yarn build && npx hardhat deploy --network localhost",
     "coverage": "hardhat coverage",
     "test": "REPORT_GAS=true hardhat test"
   },

@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import '@nomicfoundation/hardhat-toolbox'
 import '@semaphore-protocol/hardhat'
 import '@typechain/hardhat'
+import './tasks/deploy'
 
 dotenv.config({ path: join(process.cwd(), '../.env') })
 
