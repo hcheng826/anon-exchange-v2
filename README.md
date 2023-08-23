@@ -70,20 +70,32 @@ Note that transaction for buying NFT and claiming ETH can be sent from any addre
 
 ### Smart Contracts
 
-1. Go to `contracts/`
-2. Install dependencies
+Go to `contracts/`
+
+1. Install dependencies
    ```bash
    yarn
    ```
-3. Set up snark files
+2. Set up snark files
    ```bash
    yarn download:snark-artifacts
    ```
-4. Run test
-   ```bash
-   yarn test
-   ```
-5. Coverage
-   ```bash
-   yarn coverage
-   ```
+
+- Run test
+  ```bash
+  yarn test
+  ```
+- Coverage
+  ```bash
+  yarn coverage
+  ```
+- Local network deployment for developemnt
+
+  ```bash
+  npx hardhat node
+
+  # in another terminal
+  yarn deploy:local
+  ```
+
+### Frontend

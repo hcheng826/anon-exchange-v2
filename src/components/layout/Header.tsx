@@ -42,7 +42,7 @@ export function Header(props: Props) {
       <Flex alignItems="center" px={4}>
         <LinkComponent href="/">
           <Heading as="h3" size="ms">
-            Buy ETH
+            Buy NFT
           </Heading>
         </LinkComponent>
       </Flex>

@@ -23,3 +23,6 @@ export const SERVER_SESSION_SETTINGS = {
     secure: process.env.NODE_ENV === 'production',
   },
 }
+
+export const NFT_SOLD_GROUP_ID = 1
+export const ETH_DEPOSITED_GROUP_ID = 2
