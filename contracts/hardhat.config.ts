@@ -41,7 +41,7 @@ const config: HardhatUserConfig = {
     },
     sepolia: {
       chainId: 11155111,
-      url: 'https://rpc.sepolia.org/',
+      url: 'https://eth-sepolia.public.blastapi.io',
       accounts: [deployerKey as string],
     },
     mumbai: {
