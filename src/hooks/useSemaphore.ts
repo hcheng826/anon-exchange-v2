@@ -3,7 +3,6 @@ import { useCallback, useState } from 'react'
 import { SemaphoreContextType } from '../context/SemaphoreContext'
 import { useNetwork } from 'wagmi'
 import { semaphoreAddress } from 'abis'
-import { networkRpcUrl } from 'utils/network'
 import { ETH_DEPOSITED_GROUP_ID, NFT_SOLD_GROUP_ID } from 'utils/config'
 
 export default function useSemaphore(): SemaphoreContextType {
@@ -15,7 +14,7 @@ export default function useSemaphore(): SemaphoreContextType {
     if (!chain) {
       return
     }
-    const semaphore = new SemaphoreEthers(networkRpcUrl[chain.id], {
+    const semaphore = new SemaphoreEthers(chain.rpcUrls.default.http[0], {
       address: semaphoreAddress[chain.id as keyof typeof semaphoreAddress],
     })
 

@@ -6,8 +6,3 @@ export function GetNetworkColor(chain?: string) {
 
   return 'grey'
 }
-
-export const networkRpcUrl: { [key: number]: string } = {
-  31337: 'http://localhost:8545',
-  11155111: 'https://api.zan.top/node/v1/eth/sepolia/public	',
-}

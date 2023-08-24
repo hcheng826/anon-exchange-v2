@@ -24,6 +24,14 @@ export function Header(props: Props) {
       <Spacer />
 
       <Flex alignItems="center" px={4}>
+        <LinkComponent href="/mint-nft">
+          <Heading as="h1" size="ms">
+            Mint Test NFT
+          </Heading>
+        </LinkComponent>
+      </Flex>
+
+      <Flex alignItems="center" px={4}>
         <LinkComponent href="/">
           <Heading as="h1" size="ms">
             List NFT

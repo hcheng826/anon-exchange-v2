@@ -1,5 +1,5 @@
 import { ThemingProps } from '@chakra-ui/react'
-import { mainnet, sepolia, polygon, optimism, arbitrum } from '@wagmi/chains'
+import { mainnet, sepolia, polygon, optimism, arbitrum, localhost } from '@wagmi/chains'
 
 export const SITE_NAME = 'Anon Exchange'
 export const SITE_DESCRIPTION = 'anonymous exhcange based on Semaphore protocol'
@@ -14,7 +14,7 @@ export const THEME_CONFIG = {
 export const SOCIAL_TWITTER = 'lilioo826'
 export const SOCIAL_GITHUB = 'hcheng826/anon-exchange'
 
-export const ETH_CHAINS = [mainnet, sepolia, polygon, optimism, arbitrum]
+export const ETH_CHAINS = [mainnet, sepolia, polygon, optimism, arbitrum, localhost]
 
 export const SERVER_SESSION_SETTINGS = {
   cookieName: SITE_NAME,
