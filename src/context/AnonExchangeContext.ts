@@ -1,28 +1,20 @@
 import React from 'react'
 
-enum NFTStatus {
-  LISTED = 'listed',
-  SOLD = 'sold',
+export type NftListing = {
+  lister?: string
+  contractAddress: string
+  tokenId: number
+  status: 'NotListed' | 'Listed' | 'Delisted' | 'Sold'
 }
 
-type NFTEntry = {
-  [tokenId: number]: {
-    status: NFTStatus
-  }
-}
-
-type NFTAddressMap = {
-  [nftAddress: string]: NFTEntry
-}
-
-type OwnerNFTMap = {
-  [ownerAddress: string]: NFTAddressMap
-}
+type EthDeposit = {}
 
 export type AnonExchangeContextType = {
-  ownerNftMap: OwnerNFTMap
+  nftListings: NftListing[]
+  ethDeposits: EthDeposit[]
 }
 
 export default React.createContext<AnonExchangeContextType>({
-  ownerNftMap: {},
+  nftListings: [],
+  ethDeposits: [],
 })

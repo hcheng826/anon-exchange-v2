@@ -1,14 +1,18 @@
 import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction, useNetwork, Address, Chain } from 'wagmi'
-import { Button, Heading, Text, Flex, Input, Table, Thead, Tr, Th, Tbody, Td, InputGroup, InputLeftAddon } from '@chakra-ui/react'
+import { Button, Heading, Text, Flex, Input, Table, Thead, Tr, Th, Tbody, Td, InputGroup, InputLeftAddon, list, useToast } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
 import { LinkComponent } from 'components/layout/LinkComponent'
 import { simpleNftABI, simpleNftAddress } from 'abis'
-import { Dispatch, SetStateAction, useState } from 'react'
-import { NftList, NftListItem } from 'components/layout/NftList'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { NftList } from 'components/layout/NftList'
 import { SemaphoreIdentitySecretInput } from 'components/layout/SemaphoreIdentitySecretInput'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
+import useAnonExchange from 'hooks/useAnonExchange'
+import { NftListing } from 'context/AnonExchangeContext'
+import { ethers } from 'ethers'
+import { isAddress } from 'viem'
 
-function MintNFT({ address, chain }: { address: Address; chain: Chain }) {
+function MintNFT({ address, chain, setNfts }: { address: Address; chain: Chain; setNfts: Dispatch<SetStateAction<NftListing[]>> }) {
   const prepareContractWrite = usePrepareContractWrite({
     address: simpleNftAddress[chain.id as keyof typeof simpleNftAddress],
     abi: simpleNftABI,
@@ -22,6 +26,31 @@ function MintNFT({ address, chain }: { address: Address; chain: Chain }) {
   const handleSendTransation = () => {
     contractWrite.write?.()
   }
+
+  useEffect(() => {
+    const simpleNft = new ethers.Contract(
+      simpleNftAddress[chain?.id as keyof typeof simpleNftAddress],
+      simpleNftABI,
+      new ethers.providers.JsonRpcProvider(chain?.rpcUrls.default.http[0])
+    )
+    if (waitForTransaction.isSuccess) {
+      simpleNft
+        ._tokenIdCounter() // replace with your actual function name
+        .then((tokenId: string) => {
+          setNfts((prevNfts) => [
+            ...prevNfts,
+            {
+              contractAddress: simpleNft.address,
+              tokenId: parseInt(tokenId) - 1,
+              status: 'NotListed',
+            },
+          ])
+        })
+        .catch((error: any) => {
+          console.error('Error fetching tokenId:', error)
+        })
+    }
+  }, [chain?.id, chain?.rpcUrls.default.http, setNfts, waitForTransaction.isSuccess])
 
   return (
     <div>
@@ -98,28 +127,79 @@ export default function ListNft() {
   const { address, isConnected } = useAccount()
   const { chain } = useNetwork()
 
-  // TODO: initialize NFT list by useAnonExchange
-  const [nfts, setNfts] = useState<NftListItem[]>([])
+  const { nftListings } = useAnonExchange(address)
+
+  const [nfts, setNfts] = useState<NftListing[]>(
+    nftListings.filter((listing) => {
+      return listing.lister && listing.lister === address
+    })
+  )
 
   const [contractAddressInput, setContractAddressInput] = useState<string>('')
   const [tokenIdInput, setTokenIdInput] = useState<number | null>(null)
-  const [secret, setSecret] = useState('')
+
+  const toast = useToast({
+    title: 'Error',
+    status: 'error',
+    duration: 5000,
+    isClosable: true,
+    position: 'top-right', // Change to your desired corner
+  })
 
   const handleImport = () => {
-    if (contractAddressInput && tokenIdInput !== null) {
-      setNfts((prevNfts) => [
-        ...prevNfts,
-        {
-          contractAddress: contractAddressInput,
-          tokenId: tokenIdInput,
-          action: 'List NFT', // default action
-        },
-      ])
-
-      // Optionally, clear the input fields
-      setContractAddressInput('')
+    if (!contractAddressInput || tokenIdInput === null || !isAddress(contractAddressInput)) {
+      toast({
+        description: 'Invalid input',
+      })
       setTokenIdInput(null)
+      return
     }
+
+    if (
+      nfts
+        .map((nft) => {
+          return nft.contractAddress
+        })
+        .includes(contractAddressInput) &&
+      nfts
+        .map((nft) => {
+          return nft.tokenId
+        })
+        .includes(tokenIdInput)
+    ) {
+      toast({
+        description: 'Already imported',
+      })
+      setTokenIdInput(null)
+      return
+    }
+
+    const nft = new ethers.Contract(contractAddressInput, simpleNftABI, new ethers.providers.JsonRpcProvider(chain?.rpcUrls.default.http[0]))
+    nft
+      .ownerOf(tokenIdInput)
+      .then((owner: Address) => {
+        if (owner === address) {
+          setNfts((prevNfts) => [
+            ...prevNfts,
+            {
+              contractAddress: contractAddressInput,
+              tokenId: tokenIdInput,
+              status: 'NotListed', // default action
+            },
+          ])
+        } else {
+          toast({
+            description: 'Not owner of the NFT',
+          })
+        }
+      })
+      .catch((e: any) => {
+        toast({
+          description: e.reason ?? JSON.stringify(e),
+        })
+      })
+
+    setTokenIdInput(null)
   }
 
   if (isConnected && address && chain) {
@@ -133,7 +213,7 @@ export default function ListNft() {
           Mint Test NFT
         </Heading>
         {/* TODO: pass in nfts array and add to the list when mint NFT is successful */}
-        <MintNFT address={address} chain={chain} />
+        <MintNFT address={address} chain={chain} setNfts={setNfts} />
 
         <SemaphoreIdentitySecretInput />
 

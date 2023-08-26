@@ -29,9 +29,12 @@ contract AnonExchange is IERC721Receiver {
   error EthTransferFailed();
   error NftNotAvailable();
 
-  event NftListed(address lister, address nftAddr, uint256 tokenId);
-  event NftDelisted(address lister, address nftAddr, uint256 tokenId);
-  event NftSold(address lister, address nftAddr, uint256 tokenId);
+  event NftListed(address indexed lister, address nftAddr, uint256 tokenId);
+  event NftDelisted(address indexed lister, address nftAddr, uint256 tokenId);
+  event NftSold(address indexed lister, address recipient, address nftAddr, uint256 tokenId);
+  event EthDeposited(address indexed depositer);
+  event EthWithdrawn(address indexed recipient);
+  event EthClaimed(address indexed recipient);
 
   constructor(address semaphoreAddress) {
     semaphore = ISemaphore(semaphoreAddress);
@@ -71,6 +74,8 @@ contract AnonExchange is IERC721Receiver {
   function depositETH(uint256 identityCommitment) external payable {
     if (msg.value != NFT_PRICE) revert InvalidDepositAmount();
     semaphore.addMember(ETH_DEPOSITED_BUYER_GROUP_ID, identityCommitment);
+
+    emit EthDeposited(msg.sender);
   }
 
   // ETH depositer can withdraw ETH before it's spent
@@ -87,6 +92,8 @@ contract AnonExchange is IERC721Receiver {
 
     (bool success, ) = ethRecipient.call{value: NFT_PRICE}('');
     if (!success) revert EthTransferFailed();
+
+    emit EthWithdrawn(ethRecipient);
   }
 
   // Can be called by any address with proof after ETH is deposited
@@ -111,7 +118,7 @@ contract AnonExchange is IERC721Receiver {
     );
     semaphore.addMember(NFT_SOLD_SELLER_GROUP_ID, nftListingRecords[nftAddr][tokenId].idCommitment);
 
-    emit NftSold(nftListingRecords[nftAddr][tokenId].sellerAddr, nftAddr, tokenId);
+    emit NftSold(nftListingRecords[nftAddr][tokenId].sellerAddr, nftRecipient, nftAddr, tokenId);
 
     // clear the NFT listing record
     nftListingRecords[nftAddr][tokenId] = ListNFTRecord({sellerAddr: address(0), idCommitment: 0});
@@ -126,5 +133,7 @@ contract AnonExchange is IERC721Receiver {
 
     (bool success, ) = ethRecipient.call{value: NFT_PRICE}('');
     if (!success) revert EthTransferFailed();
+
+    emit EthClaimed(ethRecipient);
   }
 }

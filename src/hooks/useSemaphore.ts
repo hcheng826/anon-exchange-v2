@@ -5,7 +5,7 @@ import { useNetwork } from 'wagmi'
 import { semaphoreAddress } from 'abis'
 import { ETH_DEPOSITED_GROUP_ID, NFT_SOLD_GROUP_ID, semaphoreStartBlock } from 'utils/config'
 
-export default function useAnonExchange(): SemaphoreContextType {
+export default function useSemaphore(): SemaphoreContextType {
   const [nftSoldGroup, setNftSoldGroup] = useState<any[]>([])
   const [ethDepositedGroup, setEthDepositedGroup] = useState<any[]>([])
   // need to get eth depositer nonce as well
