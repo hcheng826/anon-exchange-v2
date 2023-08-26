@@ -17,7 +17,7 @@ contract AnonExchange is IERC721Receiver {
 
   struct ListNFTRecord {
     address sellerAddr;
-    uint idCommitment;
+    uint256 idCommitment;
   }
 
   error CallerInvalidOrNftNotAvailable();
@@ -26,6 +26,10 @@ contract AnonExchange is IERC721Receiver {
   error NoDeposit();
   error EthTransferFailed();
   error NftNotAvailable();
+
+  event NftListed(address lister, address nftAddr, uint256 tokenId);
+  event NftDelisted(address lister, address nftAddr, uint256 tokenId);
+  event NftSold(address lister, address nftAddr, uint256 tokenId);
 
   constructor(address semaphoreAddress) {
     semaphore = ISemaphore(semaphoreAddress);
@@ -47,6 +51,8 @@ contract AnonExchange is IERC721Receiver {
   function listNFT(address nftAddress, uint256 tokenId, uint256 identityCommitment) external {
     IERC721(nftAddress).safeTransferFrom(msg.sender, address(this), tokenId);
     nftListingRecords[nftAddress][tokenId] = ListNFTRecord({sellerAddr: msg.sender, idCommitment: identityCommitment});
+
+    emit NftListed(msg.sender, nftAddress, tokenId);
   }
 
   // Original NFT lister can delist the NFT before it's sold
@@ -55,6 +61,8 @@ contract AnonExchange is IERC721Receiver {
 
     nftListingRecords[nftAddress][tokenId] = ListNFTRecord({sellerAddr: address(0), idCommitment: 0});
     IERC721(nftAddress).safeTransferFrom(address(this), msg.sender, tokenId);
+
+    emit NftDelisted(msg.sender, nftAddress, tokenId);
   }
 
   // call by potential buyer
@@ -100,6 +108,8 @@ contract AnonExchange is IERC721Receiver {
       proof
     );
     semaphore.addMember(NFT_SOLD_SELLER_GROUP_ID, nftListingRecords[nftAddr][tokenId].idCommitment);
+
+    emit NftSold(nftListingRecords[nftAddr][tokenId].sellerAddr, nftAddr, tokenId);
 
     // clear the NFT listing record
     nftListingRecords[nftAddr][tokenId] = ListNFTRecord({sellerAddr: address(0), idCommitment: 0});

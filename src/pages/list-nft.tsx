@@ -136,7 +136,9 @@ export default function ListNft() {
                   </Button>
                 </Td>
                 <Td>
-                  {/* Displaying information about the NFT */}
+                  {/* show the Semaphore id info when listing is successful
+                  could consider saving it to localStorage
+                   */}
                   ...
                 </Td>
               </Tr>
