@@ -204,8 +204,6 @@ export default function ListNft() {
     setTokenIdInput(null)
   }
 
-  const listOnClick = () => {}
-
   if (isConnected && address && chain) {
     return (
       <div>
@@ -237,8 +235,9 @@ export default function ListNft() {
         <NftList
           nfts={nfts}
           statusAction={{
+            // TODO override the buttons
             NotListed: { displayAction: 'List' },
-            Sold: { displayAction: 'Sold', buttonProps: { disabled: true } },
+            Sold: { displayAction: 'Sold' },
             Delisted: { displayAction: 'List' },
             Listed: { displayAction: 'Delist' },
           }}

@@ -5,12 +5,14 @@ import { useState } from 'react'
 import { SemaphoreIdentitySecretInput } from 'components/layout/SemaphoreIdentitySecretInput'
 import { RecipientAdressInput } from 'components/layout/RecipientAdressInput'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
+import { Identity } from '@semaphore-protocol/identity'
 
 export default function ClaimEth() {
   const { address, isConnected } = useAccount()
   const { chain } = useNetwork()
 
   const [recipient, setRecipient] = useState<string>('')
+  const [semaphoreId, setSemaphoreId] = useState<Identity>()
 
   if (isConnected && address && chain) {
     return (
@@ -19,7 +21,7 @@ export default function ClaimEth() {
 
         <HeadingComponent as="h2">Claim ETH</HeadingComponent>
 
-        <SemaphoreIdentitySecretInput />
+        <SemaphoreIdentitySecretInput semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} />
 
         <RecipientAdressInput {...{ recipient, setRecipient }} />
 

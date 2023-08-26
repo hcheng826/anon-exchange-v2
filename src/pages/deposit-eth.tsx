@@ -84,6 +84,7 @@ export default function DepositEth() {
 
   // TODO: initialize NFT list from localStorage
   const [deposits, setDeposits] = useState<Deposit[]>([])
+  const [semaphoreId, setSemaphoreId] = useState<Identity>()
 
   if (isConnected && address && chain) {
     return (
@@ -92,7 +93,7 @@ export default function DepositEth() {
 
         <HeadingComponent as="h2">Deposit ETH</HeadingComponent>
 
-        <SemaphoreIdentitySecretInput />
+        <SemaphoreIdentitySecretInput semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} />
 
         <Heading as="h2" fontSize="2xl" my={4}>
           Deposit ETH

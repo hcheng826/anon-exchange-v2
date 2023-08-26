@@ -1,19 +1,22 @@
 import { Address, useAccount, useNetwork } from 'wagmi'
 import { Heading } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
-import { NftList, NftListItem } from 'components/layout/NftList'
+import { NftList } from 'components/layout/NftList'
 import { useState } from 'react'
 import { SemaphoreIdentitySecretInput } from 'components/layout/SemaphoreIdentitySecretInput'
 import { RecipientAdressInput } from 'components/layout/RecipientAdressInput'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
+import { Identity } from '@semaphore-protocol/identity'
+import { NftListing } from 'context/AnonExchangeContext'
 
 export default function BuyNft() {
   const { address, isConnected } = useAccount()
   const { chain } = useNetwork()
 
   // TODO: initialize NFT list
-  const [nfts, setNfts] = useState<NftListItem[]>([])
+  const [nfts, setNfts] = useState<NftListing[]>([])
   const [recipient, setRecipient] = useState<string>('')
+  const [semaphoreId, setSemaphoreId] = useState<Identity>()
 
   if (isConnected && address && chain) {
     return (
@@ -22,7 +25,7 @@ export default function BuyNft() {
 
         <HeadingComponent as="h2">Buy NFT</HeadingComponent>
 
-        <SemaphoreIdentitySecretInput />
+        <SemaphoreIdentitySecretInput semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} />
 
         <RecipientAdressInput {...{ recipient, setRecipient }} />
 

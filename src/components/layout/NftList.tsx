@@ -8,12 +8,14 @@ interface Props {
     NftListing['status'],
     {
       displayAction?: string
-      buttonProps?: React.ComponentProps<typeof Button>
+      renderButton?: (nft: NftListing) => JSX.Element
     }
   >
 }
 
 export function NftList(props: Props) {
+  const defaultRenderButton = (nft: NftListing) => <Button>{nft.status}</Button>
+
   return (
     <Table variant="simple">
       <Thead>
@@ -28,18 +30,7 @@ export function NftList(props: Props) {
           <Tr key={idx}>
             <Td>{nft.contractAddress}</Td>
             <Td>{nft.tokenId}</Td>
-            <Td>
-              {props.statusAction && props.statusAction[nft.status] ? (
-                <Button
-                  size="sm"
-                  {...props.statusAction[nft.status].buttonProps} // Spread the button props here
-                >
-                  {props.statusAction[nft.status].displayAction ?? nft.status}
-                </Button>
-              ) : (
-                nft.status // If no matching action is provided, just display the status.
-              )}
-            </Td>
+            <Td>{(props.statusAction?.[nft.status]?.renderButton || defaultRenderButton)(nft)}</Td>
           </Tr>
         ))}
       </Tbody>
