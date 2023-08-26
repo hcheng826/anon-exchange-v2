@@ -1,12 +1,14 @@
 import { Heading, Text, Input } from '@chakra-ui/react'
-import { Dispatch, SetStateAction } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
 
 interface Props {
-  secret: string
-  setSecret: Dispatch<SetStateAction<string>>
+  // identity: Identity
+  // setIdentity: Dispatch<SetStateAction<Identity>>
 }
 
 export function SemaphoreIdentitySecretInput(props: Props) {
+  const [secret, setSecret] = useState('')
+
   return (
     <div>
       <Heading as="h2" fontSize="2xl" my={4}>
@@ -14,7 +16,7 @@ export function SemaphoreIdentitySecretInput(props: Props) {
       </Heading>
 
       <Text>Input a secret message to generate Semaphore Identity</Text>
-      <Input type="text" placeholder="Enter your secret message..." value={props.secret} onChange={(e) => props.setSecret(e.target.value)} />
+      <Input type="text" placeholder="Enter your secret message..." value={secret} onChange={(e) => setSecret(e.target.value)} />
       <Text>
         Note:
         <br /> 1. Each secret message is associated with each NFT listing / ETH deposit. Do not reuse same value.

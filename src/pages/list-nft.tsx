@@ -6,6 +6,7 @@ import { simpleNftABI, simpleNftAddress } from 'abis'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { NftList, NftListItem } from 'components/layout/NftList'
 import { SemaphoreIdentitySecretInput } from 'components/layout/SemaphoreIdentitySecretInput'
+import { HeadingComponent } from 'components/layout/HeadingComponent'
 
 function MintNFT({ address, chain }: { address: Address; chain: Chain }) {
   const prepareContractWrite = usePrepareContractWrite({
@@ -126,13 +127,15 @@ export default function ListNft() {
       <div>
         <NextSeo title="Mint NFT" />
 
+        <HeadingComponent as="h2">List NFT</HeadingComponent>
+
         <Heading as="h2" fontSize="2xl" my={4}>
           Mint Test NFT
         </Heading>
         {/* TODO: pass in nfts array and add to the list when mint NFT is successful */}
         <MintNFT address={address} chain={chain} />
 
-        <SemaphoreIdentitySecretInput secret={secret} setSecret={setSecret} />
+        <SemaphoreIdentitySecretInput />
 
         <Heading as="h2" fontSize="2xl" my={4}>
           NFT List

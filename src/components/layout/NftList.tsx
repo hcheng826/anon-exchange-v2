@@ -12,6 +12,21 @@ interface Props {
 }
 
 export function NftList(props: Props) {
+  // mock data
+  if (props.nfts?.length === 0) {
+    props.nfts.push({
+      contractAddress: '0x123',
+      tokenId: 1,
+      action: 'Sold',
+    })
+
+    props.nfts.push({
+      contractAddress: '0x123',
+      tokenId: 1,
+      action: 'List NFT',
+    })
+  }
+
   return (
     <Table variant="simple">
       <Thead>
