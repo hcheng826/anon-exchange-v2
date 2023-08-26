@@ -3,8 +3,9 @@ import { Button, Heading, Text, Flex, Input, Table, Thead, Tr, Th, Tbody, Td, In
 import { NextSeo } from 'next-seo'
 import { LinkComponent } from 'components/layout/LinkComponent'
 import { simpleNftABI, simpleNftAddress } from 'abis'
-import { useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
 import { NftList, NftListItem } from 'components/layout/NftList'
+import { SemaphoreIdentitySecretInput } from 'components/layout/SemaphoreIdentitySecretInput'
 
 function MintNFT({ address, chain }: { address: Address; chain: Chain }) {
   const prepareContractWrite = usePrepareContractWrite({
@@ -55,6 +56,43 @@ function MintNFT({ address, chain }: { address: Address; chain: Chain }) {
   )
 }
 
+function ImportNft({
+  contractAddressInput,
+  setContractAddressInput,
+  tokenIdInput,
+  setTokenIdInput,
+  handleImport,
+}: {
+  contractAddressInput: string
+  setContractAddressInput: Dispatch<SetStateAction<string>>
+  tokenIdInput: number | null
+  setTokenIdInput: Dispatch<SetStateAction<number | null>>
+  handleImport: () => void
+}) {
+  return (
+    <div>
+      <Heading as="h2" fontSize="1xl" my={4}>
+        Import your own NFT
+      </Heading>
+
+      <Flex mb={4} align="center">
+        <InputGroup size="md" mr={2}>
+          <InputLeftAddon>NFT Address</InputLeftAddon>
+          <Input placeholder="0x12345...6789" value={contractAddressInput} onChange={(e) => setContractAddressInput(e.target.value)} />
+        </InputGroup>
+
+        <InputGroup size="md" mr={2}>
+          <InputLeftAddon>Token ID</InputLeftAddon>
+          <Input placeholder="Enter Token ID" type="number" value={tokenIdInput ?? ''} onChange={(e) => setTokenIdInput(Number(e.target.value))} />
+        </InputGroup>
+
+        {/* TODO: validate the input format and user owns the NFT */}
+        <Button onClick={handleImport}>Import</Button>
+      </Flex>
+    </div>
+  )
+}
+
 export default function ListNft() {
   const { address, isConnected } = useAccount()
   const { chain } = useNetwork()
@@ -94,40 +132,22 @@ export default function ListNft() {
         {/* TODO: pass in nfts array and add to the list when mint NFT is successful */}
         <MintNFT address={address} chain={chain} />
 
-        <Heading as="h2" fontSize="2xl" my={4}>
-          Semaphore Identity
-        </Heading>
-
-        <Text>Input a secret message to generate Semaphore Identity</Text>
-        <Input type="text" placeholder="Enter your secret message..." value={secret} onChange={(e) => setSecret(e.target.value)} />
-        <Text>
-          Note:
-          <br /> 1. Each secret message is associated with 1 NFT listing. Do not reuse same value.
-          <br /> 2. The secret message is needed when you are claiming the ETH after NFT is sold. Keep it private and do not lose it.
-        </Text>
+        <SemaphoreIdentitySecretInput secret={secret} setSecret={setSecret} />
 
         <Heading as="h2" fontSize="2xl" my={4}>
           NFT List
         </Heading>
 
-        <Heading as="h2" fontSize="1xl" my={4}>
-          Import your own NFT
-        </Heading>
+        <ImportNft
+          {...{
+            contractAddressInput,
+            setContractAddressInput,
+            tokenIdInput,
+            setTokenIdInput,
+            handleImport,
+          }}
+        />
 
-        <Flex mb={4} align="center">
-          <InputGroup size="md" mr={2}>
-            <InputLeftAddon>NFT Address</InputLeftAddon>
-            <Input placeholder="0x12345...6789" value={contractAddressInput} onChange={(e) => setContractAddressInput(e.target.value)} />
-          </InputGroup>
-
-          <InputGroup size="md" mr={2}>
-            <InputLeftAddon>Token ID</InputLeftAddon>
-            <Input placeholder="Enter Token ID" type="number" value={tokenIdInput ?? ''} onChange={(e) => setTokenIdInput(Number(e.target.value))} />
-          </InputGroup>
-
-          {/* TODO: validate the input format and user owns the NFT */}
-          <Button onClick={handleImport}>Import</Button>
-        </Flex>
         <NftList nfts={nfts} />
       </div>
     )

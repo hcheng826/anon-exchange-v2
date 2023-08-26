@@ -6,6 +6,7 @@ import { anonExchangeABI, anonExchangeAddress, simpleNftABI, simpleNftAddress } 
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Identity } from '@semaphore-protocol/identity'
 import { ethers } from 'ethers'
+import { SemaphoreIdentitySecretInput } from 'components/layout/SemaphoreIdentitySecretInput'
 
 type Deposit = {
   date: Date
@@ -82,11 +83,15 @@ export default function DepositEth() {
 
   // TODO: initialize NFT list from localStorage
   const [deposits, setDeposits] = useState<Deposit[]>([])
+  const [secret, setSecret] = useState('')
 
   if (isConnected && address && chain) {
     return (
       <div>
         <NextSeo title="Deposit ETH" />
+
+        <SemaphoreIdentitySecretInput {...{ secret, setSecret }} />
+
         <Heading as="h2" fontSize="2xl" my={4}>
           Deposit ETH
         </Heading>
