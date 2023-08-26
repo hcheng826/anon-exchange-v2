@@ -13,7 +13,7 @@ async function main() {
   console.log(`NFT deployed to ${nft.address}`)
 
   // no need to verify on localhost or hardhat
-  if (network.config.chainId != 31337 && process.env.ETHERSCAN_API_KEY) {
+  if (network.config.chainId != 1337 && process.env.ETHERSCAN_API_KEY) {
     console.log(`Waiting for block confirmation...`)
     await nft.deployTransaction.wait(10)
 

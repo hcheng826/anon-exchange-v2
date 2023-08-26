@@ -28,5 +28,5 @@ export const NFT_SOLD_GROUP_ID = '1'
 export const ETH_DEPOSITED_GROUP_ID = '2'
 export const semaphoreStartBlock = {
   11155111: 4152108,
-  31337: 0,
+  1337: 0,
 }
