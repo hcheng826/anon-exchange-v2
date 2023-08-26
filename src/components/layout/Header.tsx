@@ -48,7 +48,7 @@ export function Header(props: Props) {
       </Flex>
 
       <Flex alignItems="center" px={4}>
-        <LinkComponent href="/">
+        <LinkComponent href="/claim-eth">
           <Heading as="h3" size="ms">
             Claim ETH
           </Heading>
