@@ -13,6 +13,7 @@ type Deposit = {
 }
 
 function DepositETH({ chain, setDeposits }: { chain: Chain; setDeposits: Dispatch<SetStateAction<Deposit[]>> }) {
+  // sign message "user-addr+nonce" to generate semaphore id
   const prepareContractWrite = usePrepareContractWrite({
     address: anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress],
     abi: anonExchangeABI,
@@ -49,7 +50,7 @@ function DepositETH({ chain, setDeposits }: { chain: Chain; setDeposits: Dispatc
         disabled={waitForTransaction.isLoading || contractWrite.isLoading || !contractWrite.write}
         mt={4}
         onClick={handleSendTransation}>
-        {waitForTransaction.isLoading ? 'Depositing ETH...' : contractWrite.isLoading ? 'Check your wallet' : 'Deposit ETH'}
+        {waitForTransaction.isLoading ? 'Depositing ETH...' : contractWrite.isLoading ? 'Check your wallet' : 'Deposit 0.01 ETH'}
       </Button>
       {waitForTransaction.isSuccess && (
         <div>
@@ -87,13 +88,13 @@ export default function DepositEth() {
       <div>
         <NextSeo title="Deposit ETH" />
         <Heading as="h2" fontSize="2xl" my={4}>
-          Deposit 0.01 ETH to Buy NFT
+          Deposit ETH
         </Heading>
 
-        {/* TODO: pass in nfts array and add to the list when mint NFT is successful */}
+        {/* TODO: pass in deposits array and add to the list when deposit is successful */}
         <DepositETH chain={chain} setDeposits={setDeposits} />
 
-        <Heading as="h2" fontSize="2xl" my={4}>
+        <Heading as="h2" fontSize="1xl" my={4}>
           Deposit Records
         </Heading>
 

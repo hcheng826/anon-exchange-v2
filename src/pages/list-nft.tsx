@@ -4,6 +4,7 @@ import { NextSeo } from 'next-seo'
 import { LinkComponent } from 'components/layout/LinkComponent'
 import { simpleNftABI, simpleNftAddress } from 'abis'
 import { useState } from 'react'
+import { NftList, NftListItem } from 'components/layout/NftList'
 
 function MintNFT({ address, chain }: { address: Address; chain: Chain }) {
   const prepareContractWrite = usePrepareContractWrite({
@@ -28,7 +29,7 @@ function MintNFT({ address, chain }: { address: Address; chain: Chain }) {
         disabled={waitForTransaction.isLoading || contractWrite.isLoading || !contractWrite.write}
         mt={4}
         onClick={handleSendTransation}>
-        {waitForTransaction.isLoading ? 'Minting NFT...' : contractWrite.isLoading ? 'Check your wallet' : 'Mint NFT'}
+        {waitForTransaction.isLoading ? 'Minting NFT...' : contractWrite.isLoading ? 'Check your wallet' : 'Mint Test NFT'}
       </Button>
       {waitForTransaction.isSuccess && (
         <div>
@@ -58,16 +59,12 @@ export default function ListNft() {
   const { address, isConnected } = useAccount()
   const { chain } = useNetwork()
 
-  type NFT = {
-    contractAddress: string
-    tokenId: number
-    action: 'List NFT' | 'Delist NFT' | 'Sold'
-  }
-  // TODO: initialize NFT list
-  const [nfts, setNfts] = useState<NFT[]>([])
+  // TODO: initialize NFT list by useAnonExchange
+  const [nfts, setNfts] = useState<NftListItem[]>([])
 
   const [contractAddressInput, setContractAddressInput] = useState<string>('')
   const [tokenIdInput, setTokenIdInput] = useState<number | null>(null)
+  const [secret, setSecret] = useState('')
 
   const handleImport = () => {
     if (contractAddressInput && tokenIdInput !== null) {
@@ -90,15 +87,31 @@ export default function ListNft() {
     return (
       <div>
         <NextSeo title="Mint NFT" />
+
         <Heading as="h2" fontSize="2xl" my={4}>
           Mint Test NFT
         </Heading>
-
         {/* TODO: pass in nfts array and add to the list when mint NFT is successful */}
         <MintNFT address={address} chain={chain} />
 
         <Heading as="h2" fontSize="2xl" my={4}>
-          List NFT
+          Semaphore Identity
+        </Heading>
+
+        <Text>Input a secret message to generate Semaphore Identity</Text>
+        <Input type="text" placeholder="Enter your secret message..." value={secret} onChange={(e) => setSecret(e.target.value)} />
+        <Text>
+          Note:
+          <br /> 1. Each secret message is associated with 1 NFT listing. Do not reuse same value.
+          <br /> 2. The secret message is needed when you are claiming the ETH after NFT is sold. Keep it private and do not lose it.
+        </Text>
+
+        <Heading as="h2" fontSize="2xl" my={4}>
+          NFT List
+        </Heading>
+
+        <Heading as="h2" fontSize="1xl" my={4}>
+          Import your own NFT
         </Heading>
 
         <Flex mb={4} align="center">
@@ -115,36 +128,7 @@ export default function ListNft() {
           {/* TODO: validate the input format and user owns the NFT */}
           <Button onClick={handleImport}>Import</Button>
         </Flex>
-
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th>NFT Address</Th>
-              <Th>Token ID</Th>
-              <Th>Action</Th>
-              <Th>Semaphore Info</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {nfts.map((nft, idx) => (
-              <Tr key={idx}>
-                <Td>{nft.contractAddress}</Td>
-                <Td>{nft.tokenId}</Td>
-                <Td>
-                  <Button colorScheme="blue" size="sm">
-                    {nft.action}
-                  </Button>
-                </Td>
-                <Td>
-                  {/* show the Semaphore id info when listing is successful
-                  could consider saving it to localStorage
-                   */}
-                  ...
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
+        <NftList nfts={nfts} />
       </div>
     )
   }

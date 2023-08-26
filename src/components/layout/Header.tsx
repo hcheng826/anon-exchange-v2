@@ -40,7 +40,7 @@ export function Header(props: Props) {
       </Flex>
 
       <Flex alignItems="center" px={4}>
-        <LinkComponent href="/">
+        <LinkComponent href="/buy-nft">
           <Heading as="h3" size="ms">
             Buy NFT
           </Heading>

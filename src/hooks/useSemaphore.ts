@@ -8,6 +8,7 @@ import { ETH_DEPOSITED_GROUP_ID, NFT_SOLD_GROUP_ID, semaphoreStartBlock } from '
 export default function useAnonExchange(): SemaphoreContextType {
   const [nftSoldGroup, setNftSoldGroup] = useState<any[]>([])
   const [ethDepositedGroup, setEthDepositedGroup] = useState<any[]>([])
+  // need to get eth depositer nonce as well
   const { chain } = useNetwork()
 
   const refreshGroups = useCallback(async (): Promise<void> => {
