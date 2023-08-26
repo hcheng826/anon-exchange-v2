@@ -11,6 +11,7 @@ import useAnonExchange from 'hooks/useAnonExchange'
 import { NftListing } from 'context/AnonExchangeContext'
 import { ethers } from 'ethers'
 import { isAddress } from 'viem'
+import { Identity } from '@semaphore-protocol/identity'
 
 function MintNFT({ address, chain, setNfts }: { address: Address; chain: Chain; setNfts: Dispatch<SetStateAction<NftListing[]>> }) {
   const prepareContractWrite = usePrepareContractWrite({
@@ -137,6 +138,7 @@ export default function ListNft() {
 
   const [contractAddressInput, setContractAddressInput] = useState<string>('')
   const [tokenIdInput, setTokenIdInput] = useState<number | null>(null)
+  const [semaphoreId, setSemaphoreId] = useState<Identity>()
 
   const toast = useToast({
     title: 'Error',
@@ -202,6 +204,8 @@ export default function ListNft() {
     setTokenIdInput(null)
   }
 
+  const listOnClick = () => {}
+
   if (isConnected && address && chain) {
     return (
       <div>
@@ -212,10 +216,9 @@ export default function ListNft() {
         <Heading as="h2" fontSize="2xl" my={4}>
           Mint Test NFT
         </Heading>
-        {/* TODO: pass in nfts array and add to the list when mint NFT is successful */}
         <MintNFT address={address} chain={chain} setNfts={setNfts} />
 
-        <SemaphoreIdentitySecretInput />
+        <SemaphoreIdentitySecretInput semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} />
 
         <Heading as="h2" fontSize="2xl" my={4}>
           NFT List
@@ -231,7 +234,15 @@ export default function ListNft() {
           }}
         />
 
-        <NftList nfts={nfts} />
+        <NftList
+          nfts={nfts}
+          statusAction={{
+            NotListed: { displayAction: 'List' },
+            Sold: { displayAction: 'Sold', buttonProps: { disabled: true } },
+            Delisted: { displayAction: 'List' },
+            Listed: { displayAction: 'Delist' },
+          }}
+        />
       </div>
     )
   }

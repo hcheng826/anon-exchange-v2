@@ -4,6 +4,13 @@ import { NftListing } from 'context/AnonExchangeContext'
 
 interface Props {
   nfts?: NftListing[]
+  statusAction?: Record<
+    NftListing['status'],
+    {
+      displayAction?: string
+      buttonProps?: React.ComponentProps<typeof Button>
+    }
+  >
 }
 
 export function NftList(props: Props) {
@@ -22,13 +29,16 @@ export function NftList(props: Props) {
             <Td>{nft.contractAddress}</Td>
             <Td>{nft.tokenId}</Td>
             <Td>
-              <Button colorScheme="blue" size="sm">
-                {/* onClick List NFT: prompt user to sign message on nft addr + token id to generate semaphore id */}
-                {/* onClick Delist NFT: send tx directly */}
-                {/* onClick Buy NFT: sign message and send to relayer */}
-                {/* disable Sold*/}
-                {nft.status}
-              </Button>
+              {props.statusAction && props.statusAction[nft.status] ? (
+                <Button
+                  size="sm"
+                  {...props.statusAction[nft.status].buttonProps} // Spread the button props here
+                >
+                  {props.statusAction[nft.status].displayAction ?? nft.status}
+                </Button>
+              ) : (
+                nft.status // If no matching action is provided, just display the status.
+              )}
             </Td>
           </Tr>
         ))}

@@ -1,4 +1,4 @@
-import { SemaphoreEthers } from '@semaphore-protocol/data'
+import { GroupResponse, SemaphoreEthers } from '@semaphore-protocol/data'
 import { useCallback, useState } from 'react'
 import { SemaphoreContextType } from '../context/SemaphoreContext'
 import { useNetwork } from 'wagmi'
@@ -6,8 +6,8 @@ import { semaphoreAddress } from 'abis'
 import { ETH_DEPOSITED_GROUP_ID, NFT_SOLD_GROUP_ID, semaphoreStartBlock } from 'utils/config'
 
 export default function useSemaphore(): SemaphoreContextType {
-  const [nftSoldGroup, setNftSoldGroup] = useState<any[]>([])
-  const [ethDepositedGroup, setEthDepositedGroup] = useState<any[]>([])
+  const [nftSoldGroup, setNftSoldGroup] = useState<GroupResponse>()
+  const [ethDepositedGroup, setEthDepositedGroup] = useState<GroupResponse>()
   // need to get eth depositer nonce as well
   const { chain } = useNetwork()
 
@@ -20,8 +20,8 @@ export default function useSemaphore(): SemaphoreContextType {
       startBlock: semaphoreStartBlock[chain.id as keyof typeof semaphoreStartBlock],
     })
 
-    const _nftSoldGroup = await semaphore.getGroupMembers(NFT_SOLD_GROUP_ID)
-    const _ethDepositedGroup = await semaphore.getGroupMembers(ETH_DEPOSITED_GROUP_ID)
+    const _nftSoldGroup = await semaphore.getGroup(NFT_SOLD_GROUP_ID)
+    const _ethDepositedGroup = await semaphore.getGroup(ETH_DEPOSITED_GROUP_ID)
 
     setNftSoldGroup(_nftSoldGroup)
     setEthDepositedGroup(_ethDepositedGroup)

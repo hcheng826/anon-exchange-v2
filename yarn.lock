@@ -1733,7 +1733,7 @@
     "@ethersproject/strings" "^5.6.1"
     js-sha512 "^0.8.0"
 
-"@semaphore-protocol/proof@^3.10.1":
+"@semaphore-protocol/proof@^3.11.0":
   version "3.11.0"
   resolved "https://registry.yarnpkg.com/@semaphore-protocol/proof/-/proof-3.11.0.tgz#bafc180790b7400d34b5b19c5003a0b81d7a8222"
   integrity sha512-MMETUKk+ILhDu+Yk3qyIT2u9R4GWe+rP8EtAVZ+kp6Eg2BEDX0k8JeKjymN3puWyZYAZWx6OYUldEj6w+KvmUw==
