@@ -8,12 +8,14 @@ import '@semaphore-protocol/contracts/interfaces/ISemaphore.sol';
 contract AnonExchange is IERC721Receiver {
   ISemaphore public semaphore;
 
-  uint public constant NFT_SOLD_SELLER_GROUP_ID = 1;
-  uint public constant ETH_DEPOSITED_BUYER_GROUP_ID = 2;
+  uint256 public constant NFT_SOLD_SELLER_GROUP_ID = 1;
+  uint256 public constant ETH_DEPOSITED_BUYER_GROUP_ID = 2;
 
-  uint public constant BUYER_WITHDRAW_UNSPENT_ETH_SIGNAL = 0;
-  uint public constant BUYER_BUY_AND_CLAIM_NFT_SIGNAL = 1;
-  uint public constant SELLER_CLAIM_ETH_SIGNAL = 2;
+  uint256 public constant BUYER_WITHDRAW_UNSPENT_ETH_SIGNAL = 0;
+  uint256 public constant BUYER_BUY_AND_CLAIM_NFT_SIGNAL = 1;
+  uint256 public constant SELLER_CLAIM_ETH_SIGNAL = 2;
+
+  uint256 public constant NFT_PRICE = 0.01 ether;
 
   struct ListNFTRecord {
     address sellerAddr;
@@ -67,7 +69,7 @@ contract AnonExchange is IERC721Receiver {
 
   // call by potential buyer
   function depositETH(uint256 identityCommitment) external payable {
-    if (msg.value != 0.1 ether) revert InvalidDepositAmount();
+    if (msg.value != NFT_PRICE) revert InvalidDepositAmount();
     semaphore.addMember(ETH_DEPOSITED_BUYER_GROUP_ID, identityCommitment);
   }
 
@@ -83,14 +85,14 @@ contract AnonExchange is IERC721Receiver {
       proof
     );
 
-    (bool success, ) = ethRecipient.call{value: 0.1 ether}('');
+    (bool success, ) = ethRecipient.call{value: NFT_PRICE}('');
     if (!success) revert EthTransferFailed();
   }
 
   // Can be called by any address with proof after ETH is deposited
   function buyAndClaimNFT(
     address nftAddr,
-    uint tokenId,
+    uint256 tokenId,
     uint256 merkleTreeRoot,
     uint256 nullifierHash,
     uint256[8] calldata proof,
@@ -122,7 +124,7 @@ contract AnonExchange is IERC721Receiver {
   function claimETH(address ethRecipient, uint256 merkleTreeRoot, uint256 nullifierHash, uint256[8] calldata proof) external {
     semaphore.verifyProof(NFT_SOLD_SELLER_GROUP_ID, merkleTreeRoot, SELLER_CLAIM_ETH_SIGNAL, nullifierHash, NFT_SOLD_SELLER_GROUP_ID, proof);
 
-    (bool success, ) = ethRecipient.call{value: 0.1 ether}('');
+    (bool success, ) = ethRecipient.call{value: NFT_PRICE}('');
     if (!success) revert EthTransferFailed();
   }
 }

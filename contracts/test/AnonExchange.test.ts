@@ -15,6 +15,8 @@ describe('anonExchange', () => {
   let deployer: SignerWithAddress
   let accounts: SignerWithAddress[]
 
+  let nftPrice: BigNumber
+
   const sellerIdentity = new Identity()
   const buyerIdentity = new Identity()
 
@@ -40,6 +42,7 @@ describe('anonExchange', () => {
     anonExchange = await anonExchangeFactory.deploy(semaphore.address)
     await anonExchange.deployed()
 
+    nftPrice = await anonExchange.NFT_PRICE()
     const simpleNFTFactory = await ethers.getContractFactory('SimpleNFT')
     simpleNFT = await simpleNFTFactory.deploy()
   })
@@ -62,7 +65,7 @@ describe('anonExchange', () => {
   })
 
   it('buyer can deposit ETH', async () => {
-    const depositAmount = ethers.utils.parseEther('0.1')
+    const depositAmount = nftPrice
 
     const contractBalBefore = await ethers.provider.getBalance(anonExchange.address)
     await anonExchange.connect(accounts[1]).depositETH(buyerIdentity.commitment, {
@@ -101,7 +104,7 @@ describe('anonExchange', () => {
     await anonExchange.connect(accounts[0]).claimETH(ethRecipient.address, fullProof.merkleTreeRoot, fullProof.nullifierHash, fullProof.proof)
 
     const finalBalance = await ethRecipient.getBalance()
-    expect(finalBalance.sub(initBalance)).to.eq(ethers.utils.parseEther('0.1'))
+    expect(finalBalance.sub(initBalance)).to.eq(nftPrice)
   })
 
   it('seller can list NFT and delist NFT', async () => {
@@ -125,7 +128,7 @@ describe('anonExchange', () => {
   // - buyer and depositETH and withdrawETH unspent, and cannot withdraw twice
   let depositETHProof: any
   it('buyer can deposit ETH and then withdraw unspent ETH', async () => {
-    const depositAmount = ethers.utils.parseEther('0.1')
+    const depositAmount = nftPrice
     const depositIdentity = new Identity()
 
     await anonExchange.connect(accounts[1]).depositETH(depositIdentity.commitment, {
@@ -173,7 +176,7 @@ describe('anonExchange', () => {
     const sellerIdentity2 = new Identity()
     await anonExchange.connect(accounts[0]).listNFT(simpleNFT.address, tokenId2, sellerIdentity2.commitment)
 
-    const depositAmount = ethers.utils.parseEther('0.1')
+    const depositAmount = nftPrice
     const depositIdentity = new Identity()
 
     await anonExchange.connect(accounts[1]).depositETH(depositIdentity.commitment, {
@@ -207,7 +210,7 @@ describe('anonExchange', () => {
     const sellerIdentity = new Identity()
     await anonExchange.connect(accounts[0]).listNFT(simpleNFT.address, tokenId, sellerIdentity.commitment)
 
-    const depositAmount = ethers.utils.parseEther('0.1')
+    const depositAmount = nftPrice
     const depositIdentity = new Identity()
 
     await anonExchange.connect(accounts[1]).depositETH(depositIdentity.commitment, {
@@ -258,8 +261,8 @@ describe('anonExchange', () => {
     )
   })
 
-  it('depositETH reverted if value not 0.1 ethers', async () => {
-    const depositAmount = ethers.utils.parseEther('0.2')
+  it('depositETH reverted if value not NFT price', async () => {
+    const depositAmount = nftPrice.mul(2)
 
     await ethers.provider.getBalance(anonExchange.address)
     await expect(
@@ -270,7 +273,7 @@ describe('anonExchange', () => {
   })
 
   it('EthTransferFailed if withdraw to address that cannot receive eth (withdrawETH)', async () => {
-    const depositAmount = ethers.utils.parseEther('0.1')
+    const depositAmount = nftPrice
     const depositIdentity = new Identity()
 
     await anonExchange.connect(accounts[1]).depositETH(depositIdentity.commitment, {
@@ -302,7 +305,7 @@ describe('anonExchange', () => {
     const sellerIdentity = new Identity()
     await anonExchange.connect(accounts[0]).listNFT(simpleNFT.address, tokenId, sellerIdentity.commitment)
 
-    const depositAmount = ethers.utils.parseEther('0.1')
+    const depositAmount = nftPrice
     const depositIdentity = new Identity()
 
     await anonExchange.connect(accounts[1]).depositETH(depositIdentity.commitment, {
@@ -343,7 +346,7 @@ describe('anonExchange', () => {
     const sellerIdentity = new Identity()
     await anonExchange.connect(accounts[0]).listNFT(simpleNFT.address, tokenId, sellerIdentity.commitment)
 
-    const depositAmount = ethers.utils.parseEther('0.1')
+    const depositAmount = nftPrice
     const depositIdentity = new Identity()
 
     await anonExchange.connect(accounts[1]).depositETH(depositIdentity.commitment, {

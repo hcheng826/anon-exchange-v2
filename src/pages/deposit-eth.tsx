@@ -85,9 +85,9 @@ export default function DepositEth() {
   if (isConnected && address && chain) {
     return (
       <div>
-        <NextSeo title="Deposit NFT" />
+        <NextSeo title="Deposit ETH" />
         <Heading as="h2" fontSize="2xl" my={4}>
-          Deposit 0.1 ETH to Buy NFT
+          Deposit 0.01 ETH to Buy NFT
         </Heading>
 
         {/* TODO: pass in nfts array and add to the list when mint NFT is successful */}
