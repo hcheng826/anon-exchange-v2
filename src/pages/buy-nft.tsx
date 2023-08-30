@@ -37,7 +37,7 @@ export default function BuyNft() {
           NFT Listings
         </Heading>
 
-        <NftList nfts={nfts} />
+        <NftList nfts={nfts} chain={chain} />
       </div>
     )
   }

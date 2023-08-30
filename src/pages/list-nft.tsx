@@ -1,15 +1,25 @@
-import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction, useNetwork, Address, Chain } from 'wagmi'
+import {
+  useAccount,
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+  useNetwork,
+  Address,
+  Chain,
+  useContractRead,
+  useContractEvent,
+} from 'wagmi'
 import { Button, Heading, Text, Flex, Input, Table, Thead, Tr, Th, Tbody, Td, InputGroup, InputLeftAddon, list, useToast } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
 import { LinkComponent } from 'components/layout/LinkComponent'
-import { simpleNftABI, simpleNftAddress } from 'abis'
+import { anonExchangeABI, anonExchangeAddress, simpleNftABI, simpleNftAddress } from 'abis'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { NftList } from 'components/layout/NftList'
 import { SemaphoreIdentitySecretInput } from 'components/layout/SemaphoreIdentitySecretInput'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
 import useAnonExchange from 'hooks/useAnonExchange'
 import { NftListing } from 'context/AnonExchangeContext'
-import { ethers } from 'ethers'
+import { Contract, ethers } from 'ethers'
 import { isAddress } from 'viem'
 import { Identity } from '@semaphore-protocol/identity'
 
@@ -124,11 +134,99 @@ function ImportNft({
   )
 }
 
-export default function ListNft() {
+interface ListNFTProps {
+  nft: NftListing
+  chain: Chain
+  identity: Identity
+}
+
+const ListNFT: React.FC<ListNFTProps> = ({ nft, chain, identity }) => {
+  const anonExchangeAddr = anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress]
+  const [approved, setApproved] = useState<boolean>(false)
+  const [listed, setListed] = useState<boolean>(false)
+
+  // check approval
+  const { data: approvedAddress } = useContractRead({
+    address: nft.contractAddress as Address,
+    abi: simpleNftABI,
+    functionName: 'getApproved',
+    args: [BigInt(nft.tokenId)],
+    watch: true,
+  })
+
+  useEffect(() => {
+    setApproved(approvedAddress === anonExchangeAddr)
+  }, [anonExchangeAddr, approvedAddress, nft.contractAddress, nft.tokenId])
+
+  // listen to list and delist NFT event
+  useContractEvent({
+    address: anonExchangeAddr,
+    abi: anonExchangeABI,
+    eventName: 'NftListed',
+    listener(log) {
+      const { nftAddr, tokenId } = log[0]?.args
+      if (nftAddr === nft.contractAddress && tokenId === BigInt(nft.tokenId)) {
+        setListed(true)
+      }
+    },
+  })
+
+  useContractEvent({
+    address: anonExchangeAddr,
+    abi: anonExchangeABI,
+    eventName: 'NftDelisted',
+    listener(log) {
+      const { nftAddr, tokenId } = log[0]?.args
+      if (nftAddr === nft.contractAddress && tokenId === BigInt(nft.tokenId)) {
+        setListed(false)
+      }
+    },
+  })
+
+  // prepare contract write
+  const prepareApprove = usePrepareContractWrite({
+    address: nft.contractAddress as Address,
+    abi: simpleNftABI,
+    functionName: 'approve',
+    args: [anonExchangeAddr, BigInt(nft.tokenId)],
+  })
+
+  const approve = useContractWrite(prepareApprove.config)
+
+  const prepareListNFT = usePrepareContractWrite({
+    address: anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress],
+    abi: anonExchangeABI,
+    functionName: 'listNFT',
+    args: [nft.contractAddress as Address, BigInt(nft.tokenId), identity.commitment],
+  })
+
+  const listNft = useContractWrite(prepareListNFT.config)
+
+  const handleApprove = () => {
+    approve.write?.()
+  }
+
+  const handleListNft = () => {
+    listNft.write?.()
+  }
+
+  if (listed) {
+    return <Button onClick={handleApprove}>Delist</Button>
+  }
+
+  if (!approved) {
+    return <Button onClick={handleApprove}>Approve</Button>
+  } else {
+    return <Button onClick={handleListNft}>List</Button>
+  }
+}
+
+export default function ListNftPage() {
   const { address, isConnected } = useAccount()
   const { chain } = useNetwork()
 
-  const { nftListings } = useAnonExchange(address)
+  // const { nftListings } = useAnonExchange(address)
+  const nftListings: NftListing[] = []
 
   const [nfts, setNfts] = useState<NftListing[]>(
     nftListings.filter((listing) => {
@@ -236,11 +334,13 @@ export default function ListNft() {
           nfts={nfts}
           statusAction={{
             // TODO override the buttons
-            NotListed: { displayAction: 'List' },
-            Sold: { displayAction: 'Sold' },
-            Delisted: { displayAction: 'List' },
-            Listed: { displayAction: 'Delist' },
+            NotListed: { renderButton: (nft, chain, identity) => <ListNFT nft={nft} chain={chain} identity={identity} /> },
+            Sold: {},
+            Delisted: { renderButton: (nft, chain, identity) => <ListNFT nft={nft} chain={chain} identity={identity} /> },
+            Listed: {},
           }}
+          chain={chain}
+          identity={semaphoreId}
         />
       </div>
     )
