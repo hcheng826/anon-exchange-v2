@@ -246,6 +246,14 @@ export default function ListNftPage() {
     position: 'top-right', // Change to your desired corner
   })
 
+  const { data: ownerOfImportNft } = useContractRead({
+    address: contractAddressInput as Address,
+    abi: simpleNftABI,
+    functionName: 'ownerOf',
+    args: [BigInt(tokenIdInput || 0)],
+    watch: true,
+  })
+
   const handleImport = () => {
     if (!contractAddressInput || tokenIdInput === null || !isAddress(contractAddressInput)) {
       toast({
@@ -274,30 +282,20 @@ export default function ListNftPage() {
       return
     }
 
-    const nft = new ethers.Contract(contractAddressInput, simpleNftABI, new ethers.providers.JsonRpcProvider(chain?.rpcUrls.default.http[0]))
-    nft
-      .ownerOf(tokenIdInput)
-      .then((owner: Address) => {
-        if (owner === address) {
-          setNfts((prevNfts) => [
-            ...prevNfts,
-            {
-              contractAddress: contractAddressInput,
-              tokenId: tokenIdInput,
-              status: 'NotListed', // default action
-            },
-          ])
-        } else {
-          toast({
-            description: 'Not owner of the NFT',
-          })
-        }
+    if (ownerOfImportNft === address) {
+      setNfts((prevNfts) => [
+        ...prevNfts,
+        {
+          contractAddress: contractAddressInput,
+          tokenId: tokenIdInput,
+          status: 'NotListed', // default action
+        },
+      ])
+    } else {
+      toast({
+        description: 'Not owner of the NFT',
       })
-      .catch((e: any) => {
-        toast({
-          description: e.reason ?? JSON.stringify(e),
-        })
-      })
+    }
 
     setTokenIdInput(null)
   }
