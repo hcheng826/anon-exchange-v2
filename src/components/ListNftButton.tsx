@@ -1,7 +1,7 @@
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, Address, Chain, useContractRead } from 'wagmi'
 import { Button } from '@chakra-ui/react'
 import { anonExchangeABI, anonExchangeAddress, simpleNftABI, simpleNftAddress } from 'abis'
-import { useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { NftListing, NftStatus } from 'context/AnonExchangeContext'
 import { Identity } from '@semaphore-protocol/identity'
 
@@ -10,9 +10,10 @@ interface ListNFTProps {
   chain: Chain
   identity: Identity
   updateNftStatus: (nft: NftListing, newStatus: NftStatus) => void
+  setSemaphoreId: Dispatch<SetStateAction<Identity | undefined>>
 }
 
-export function ListNFT({ nft, chain, identity, updateNftStatus }: ListNFTProps) {
+export function ListNFT({ nft, chain, identity, updateNftStatus, setSemaphoreId }: ListNFTProps) {
   const anonExchangeAddr = anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress]
   const [approved, setApproved] = useState<boolean>(false)
 
@@ -52,8 +53,9 @@ export function ListNFT({ nft, chain, identity, updateNftStatus }: ListNFTProps)
     setApproved(approvedAddress === anonExchangeAddr)
     if (listNftWait.isSuccess) {
       updateNftStatus(nft, 'Listed')
+      setSemaphoreId(undefined)
     }
-  }, [anonExchangeAddr, approvedAddress, listNftWait.isSuccess, nft, updateNftStatus])
+  }, [anonExchangeAddr, approvedAddress, listNftWait.isSuccess, nft, setSemaphoreId, updateNftStatus])
 
   if (!approved) {
     return <Button onClick={handleApprove}>Approve</Button>

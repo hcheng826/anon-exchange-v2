@@ -12,8 +12,8 @@ interface Props {
       renderButton?: (
         nft: NftListing,
         chain: Chain,
-        identity: Identity,
-        updateNftStatus: (nft: NftListing, newStatus: NftStatus) => void
+        identity?: Identity,
+        updateNftStatus?: (nft: NftListing, newStatus: NftStatus) => void
       ) => JSX.Element
     }
   >
@@ -41,17 +41,7 @@ export function NftList(props: Props) {
             <Tr key={idx}>
               <Td>{nft.contractAddress}</Td>
               <Td>{nft.tokenId}</Td>
-              <Td>
-                {props.identity ? (
-                  renderButton ? (
-                    renderButton(nft, props.chain, props.identity, props.updateNftStatus)
-                  ) : (
-                    defaultRenderButton(nft)
-                  )
-                ) : (
-                  <Button disabled={true}>Please generate Semaphore Id first</Button>
-                )}
-              </Td>
+              <Td>{renderButton ? renderButton(nft, props.chain, props.identity, props.updateNftStatus) : defaultRenderButton(nft)}</Td>
             </Tr>
           )
         })}

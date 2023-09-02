@@ -6,7 +6,7 @@ import { anonExchangeABI, anonExchangeAddress, simpleNftABI, simpleNftAddress } 
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Identity } from '@semaphore-protocol/identity'
 import { ethers } from 'ethers'
-import { SemaphoreIdentitySecretInput } from 'components/SemaphoreIdentitySecretInput'
+import { SemaphoreIdentityGenerate } from 'components/SemaphoreIdentityGenerate'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
 
 type Deposit = {
@@ -93,7 +93,7 @@ export default function DepositEth() {
 
         <HeadingComponent as="h2">Deposit ETH</HeadingComponent>
 
-        <SemaphoreIdentitySecretInput semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} />
+        <SemaphoreIdentityGenerate semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} />
 
         <Heading as="h2" fontSize="2xl" my={4}>
           Deposit ETH

@@ -1,9 +1,9 @@
 import { useAccount, useNetwork } from 'wagmi'
-import { Heading } from '@chakra-ui/react'
+import { Button, Heading } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
 import { useState } from 'react'
 import { NftList } from 'components/NftList'
-import { SemaphoreIdentitySecretInput } from 'components/SemaphoreIdentitySecretInput'
+import { SemaphoreIdentityGenerate } from 'components/SemaphoreIdentityGenerate'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
 import { NftListing, NftStatus } from 'context/AnonExchangeContext'
 import { Identity } from '@semaphore-protocol/identity'
@@ -48,7 +48,7 @@ export default function ListNftPage() {
         </Heading>
         <MintNFT address={address} chain={chain} setNfts={setNfts} />
 
-        <SemaphoreIdentitySecretInput semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} />
+        <SemaphoreIdentityGenerate semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} />
 
         <Heading as="h2" fontSize="2xl" my={4}>
           NFT List
@@ -71,15 +71,21 @@ export default function ListNftPage() {
           statusAction={{
             // TODO override the buttons
             NotListed: {
-              renderButton: (nft, chain, identity, updateNftStatus) => (
-                <ListNFT nft={nft} chain={chain} identity={identity} updateNftStatus={updateNftStatus} />
-              ),
+              renderButton: semaphoreId
+                ? (nft, chain) => (
+                    <ListNFT nft={nft} chain={chain} identity={semaphoreId} updateNftStatus={updateNftStatus} setSemaphoreId={setSemaphoreId} />
+                  )
+                : () => <Button disabled={true}>Please generate Semaphore Id first</Button>,
             },
             Sold: {},
             Delisted: {
-              renderButton: (nft, chain, identity) => <ListNFT nft={nft} chain={chain} identity={identity} updateNftStatus={updateNftStatus} />,
+              renderButton: semaphoreId
+                ? (nft, chain) => (
+                    <ListNFT nft={nft} chain={chain} identity={semaphoreId} updateNftStatus={updateNftStatus} setSemaphoreId={setSemaphoreId} />
+                  )
+                : () => <Button disabled={true}>Please generate Semaphore Id first</Button>,
             },
-            Listed: { renderButton: (nft, chain, identity) => <DelistNFT nft={nft} chain={chain} updateNftStatus={updateNftStatus} /> },
+            Listed: { renderButton: (nft, chain) => <DelistNFT nft={nft} chain={chain} updateNftStatus={updateNftStatus} /> },
           }}
           chain={chain}
           identity={semaphoreId}

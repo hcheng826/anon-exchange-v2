@@ -3,7 +3,7 @@ import { Heading } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
 import { NftList } from 'components/NftList'
 import { useState } from 'react'
-import { SemaphoreIdentitySecretInput } from 'components/SemaphoreIdentitySecretInput'
+// import { SemaphoreIdentitySecretInput } from 'components/SemaphoreIdentityGenerate'
 import { RecipientAdressInput } from 'components/layout/RecipientAdressInput'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
 import { Identity } from '@semaphore-protocol/identity'
@@ -25,7 +25,7 @@ export default function BuyNft() {
 
         <HeadingComponent as="h2">Buy NFT</HeadingComponent>
 
-        <SemaphoreIdentitySecretInput semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} />
+        {/* <SemaphoreIdentitySecretInput semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} /> */}
 
         <RecipientAdressInput {...{ recipient, setRecipient }} />
 
@@ -37,7 +37,7 @@ export default function BuyNft() {
           NFT Listings
         </Heading>
 
-        <NftList nfts={nfts} chain={chain} />
+        {/* <NftList nfts={nfts} chain={chain} /> */}
       </div>
     )
   }

@@ -2,7 +2,7 @@ import { Address, useAccount, useNetwork } from 'wagmi'
 import { Button, Heading } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
 import { useState } from 'react'
-import { SemaphoreIdentitySecretInput } from 'components/SemaphoreIdentitySecretInput'
+// import { SemaphoreIdentitySecretInput } from 'components/SemaphoreIdentityGenerate'
 import { RecipientAdressInput } from 'components/layout/RecipientAdressInput'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
 import { Identity } from '@semaphore-protocol/identity'
@@ -21,7 +21,7 @@ export default function ClaimEth() {
 
         <HeadingComponent as="h2">Claim ETH</HeadingComponent>
 
-        <SemaphoreIdentitySecretInput semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} />
+        {/* <SemaphoreIdentitySecretInput semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} /> */}
 
         <RecipientAdressInput {...{ recipient, setRecipient }} />
 
