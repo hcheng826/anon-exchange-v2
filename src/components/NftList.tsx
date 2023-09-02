@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button, Table, Thead, Tr, Th, Tbody, Td } from '@chakra-ui/react'
-import { NftListing } from 'context/AnonExchangeContext'
+import { NftListing, NftStatus } from 'context/AnonExchangeContext'
 import { Chain } from 'wagmi'
 import { Identity } from '@semaphore-protocol/identity'
 
@@ -9,11 +9,17 @@ interface Props {
   statusAction?: Record<
     NftListing['status'],
     {
-      renderButton?: (nft: NftListing, chain: Chain, identity: Identity) => JSX.Element
+      renderButton?: (
+        nft: NftListing,
+        chain: Chain,
+        identity: Identity,
+        updateNftStatus: (nft: NftListing, newStatus: NftStatus) => void
+      ) => JSX.Element
     }
   >
   chain: Chain
   identity?: Identity
+  updateNftStatus: (nft: NftListing, newStatus: NftStatus) => void
 }
 
 export function NftList(props: Props) {
@@ -38,7 +44,7 @@ export function NftList(props: Props) {
               <Td>
                 {props.identity ? (
                   renderButton ? (
-                    renderButton(nft, props.chain, props.identity)
+                    renderButton(nft, props.chain, props.identity, props.updateNftStatus)
                   ) : (
                     defaultRenderButton(nft)
                   )

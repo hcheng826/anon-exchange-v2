@@ -1,10 +1,12 @@
 import React from 'react'
 
+export type NftStatus = 'NotListed' | 'Listed' | 'Delisted' | 'Sold'
+
 export type NftListing = {
   lister?: string
   contractAddress: string
   tokenId: number
-  status: 'NotListed' | 'Listed' | 'Delisted' | 'Sold'
+  status: NftStatus
 }
 
 type EthDeposit = {}

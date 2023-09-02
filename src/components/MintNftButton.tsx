@@ -6,7 +6,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { NftListing } from 'context/AnonExchangeContext'
 
 export function MintNFT({ address, chain, setNfts }: { address: Address; chain: Chain; setNfts: Dispatch<SetStateAction<NftListing[]>> }) {
-  const { data: simpleNftTokenIdCounter, refetch: tokenIdRefetch } = useContractRead({
+  const { refetch: tokenIdRefetch } = useContractRead({
     address: simpleNftAddress[chain?.id as keyof typeof simpleNftAddress],
     abi: simpleNftABI,
     functionName: '_tokenIdCounter',

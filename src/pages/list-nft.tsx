@@ -1,29 +1,16 @@
-import {
-  useAccount,
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
-  useNetwork,
-  Address,
-  Chain,
-  useContractRead,
-  useContractEvent,
-} from 'wagmi'
-import { Button, Heading, Text, Flex, Input, Table, Thead, Tr, Th, Tbody, Td, InputGroup, InputLeftAddon, list, useToast } from '@chakra-ui/react'
+import { useAccount, useNetwork } from 'wagmi'
+import { Heading } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
-import { LinkComponent } from 'components/layout/LinkComponent'
-import { anonExchangeABI, anonExchangeAddress, simpleNftABI, simpleNftAddress } from 'abis'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { useState } from 'react'
 import { NftList } from 'components/NftList'
 import { SemaphoreIdentitySecretInput } from 'components/SemaphoreIdentitySecretInput'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
-import useAnonExchange from 'hooks/useAnonExchange'
-import { NftListing } from 'context/AnonExchangeContext'
-import { isAddress } from 'viem'
+import { NftListing, NftStatus } from 'context/AnonExchangeContext'
 import { Identity } from '@semaphore-protocol/identity'
 import { MintNFT } from 'components/MintNftButton'
 import { ImportNft } from 'components/ImportNftButton'
 import { ListNFT } from 'components/ListNftButton'
+import { DelistNFT } from 'components/DelistNftButton'
 
 export default function ListNftPage() {
   const { address, isConnected } = useAccount()
@@ -40,6 +27,14 @@ export default function ListNftPage() {
   const [contractAddressInput, setContractAddressInput] = useState<string>('')
   const [tokenIdInput, setTokenIdInput] = useState<number | null>(null)
   const [semaphoreId, setSemaphoreId] = useState<Identity>()
+
+  function updateNftStatus(nft: NftListing, newStatus: NftStatus) {
+    const updatedNfts = nfts.map((_nft) =>
+      nft.tokenId === _nft.tokenId && nft.contractAddress === _nft.contractAddress ? { ...nft, status: newStatus } : nft
+    )
+
+    setNfts(updatedNfts)
+  }
 
   if (isConnected && address && chain) {
     return (
@@ -75,13 +70,20 @@ export default function ListNftPage() {
           nfts={nfts}
           statusAction={{
             // TODO override the buttons
-            NotListed: { renderButton: (nft, chain, identity) => <ListNFT nft={nft} chain={chain} identity={identity} /> },
+            NotListed: {
+              renderButton: (nft, chain, identity, updateNftStatus) => (
+                <ListNFT nft={nft} chain={chain} identity={identity} updateNftStatus={updateNftStatus} />
+              ),
+            },
             Sold: {},
-            Delisted: { renderButton: (nft, chain, identity) => <ListNFT nft={nft} chain={chain} identity={identity} /> },
-            Listed: {},
+            Delisted: {
+              renderButton: (nft, chain, identity) => <ListNFT nft={nft} chain={chain} identity={identity} updateNftStatus={updateNftStatus} />,
+            },
+            Listed: { renderButton: (nft, chain, identity) => <DelistNFT nft={nft} chain={chain} updateNftStatus={updateNftStatus} /> },
           }}
           chain={chain}
           identity={semaphoreId}
+          updateNftStatus={updateNftStatus}
         />
       </div>
     )

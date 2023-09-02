@@ -10,6 +10,7 @@ interface Props {
   setSemaphoreId: Dispatch<SetStateAction<Identity | undefined>>
 }
 
+// TODO: random generate uuid
 export function SemaphoreIdentitySecretInput(props: Props) {
   const [secret, setSecret] = useState('')
   const { address } = useAccount()
