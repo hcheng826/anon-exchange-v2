@@ -8,6 +8,7 @@ import { RecipientAdressInput } from 'components/layout/RecipientAdressInput'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
 import { Identity } from '@semaphore-protocol/identity'
 import { NftListing } from 'context/AnonExchangeContext'
+import { SemaphoreIdentityVerify } from 'components/SemaphoreIdentityVerify'
 
 export default function BuyNft() {
   const { address, isConnected } = useAccount()
@@ -25,7 +26,7 @@ export default function BuyNft() {
 
         <HeadingComponent as="h2">Buy NFT</HeadingComponent>
 
-        {/* <SemaphoreIdentitySecretInput semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} /> */}
+        <SemaphoreIdentityVerify semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} />
 
         <RecipientAdressInput {...{ recipient, setRecipient }} />
 

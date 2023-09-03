@@ -1,11 +1,11 @@
 import React from 'react'
-import { GroupResponse } from '@semaphore-protocol/data'
+import { Group } from '@semaphore-protocol/group'
 
 export type SemaphoreContextType = {
   // nftSoldGroup: string[]
   // ethDepositedGroup: string[]
-  nftSoldGroup: GroupResponse | undefined
-  ethDepositedGroup: GroupResponse | undefined
+  nftSoldGroup: Group | undefined
+  ethDepositedGroup: Group | undefined
   refreshGroups: () => Promise<void>
 }
 

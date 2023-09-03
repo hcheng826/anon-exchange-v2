@@ -1,8 +1,6 @@
-import { Heading, Text, Input, Flex, Button, useToast, Alert, AlertIcon, useEditable } from '@chakra-ui/react'
+import { Heading, Text, Input, Flex, Button, useToast, Alert, AlertIcon } from '@chakra-ui/react'
 import { Identity } from '@semaphore-protocol/identity'
 import { Dispatch, SetStateAction, useState } from 'react'
-import { generateProof } from '@semaphore-protocol/proof'
-import { useAccount } from 'wagmi'
 
 interface Props {
   semaphoreId: Identity | undefined
@@ -13,12 +11,10 @@ interface Props {
 
 export function SemaphoreIdentityGenerate(props: Props) {
   const { secret, refreshSecret } = props
-  const { address } = useAccount()
   const toast = useToast()
 
   const handleConfirmSecret = () => {
-    const processedSecret = `${address}-${secret}`
-    const identity = new Identity(processedSecret)
+    const identity = new Identity(secret)
     props.setSemaphoreId(identity)
     toast({ description: 'Semaphore Identity created successfully' })
   }
@@ -55,14 +51,12 @@ export function SemaphoreIdentityGenerate(props: Props) {
         {props.semaphoreId !== undefined && (
           <Alert status="success">
             <AlertIcon />
-            Semaphore Identity created successfully with secret: {secret} (do not reuse or lose it)
+            Semaphore Identity created successfully with secret: {secret} (note it down, it will NOT appear again)
           </Alert>
         )}
       </Flex>
       <Text>
-        Note:
-        <br /> 1. Each secret message is associated with each NFT listing / ETH deposit. Do not reuse the same value.
-        <br /> 2. The secret message is needed when you are claiming the ETH after the NFT is sold / Buying the NFT with a deposit. Carefully keep it
+        Note: The secret message is needed when you are claiming the ETH after the NFT is sold / Buying the NFT with a deposit. Carefully keep it
         private and do not lose it.
       </Text>
     </div>
