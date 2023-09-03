@@ -14,9 +14,13 @@ type EthDeposit = {}
 export type AnonExchangeContextType = {
   nftListings: NftListing[]
   ethDeposits: EthDeposit[]
+  refreshNftListing: () => Promise<void>
+  refreshEthDeposits: () => Promise<void>
 }
 
 export default React.createContext<AnonExchangeContextType>({
   nftListings: [],
   ethDeposits: [],
+  refreshNftListing: async () => {},
+  refreshEthDeposits: async () => {},
 })

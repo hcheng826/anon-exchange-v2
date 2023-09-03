@@ -1,25 +1,39 @@
 import { Address, useAccount, useNetwork } from 'wagmi'
-import { Heading } from '@chakra-ui/react'
+import { Button, Heading } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
 import { NftList } from 'components/NftList'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 // import { SemaphoreIdentitySecretInput } from 'components/SemaphoreIdentityGenerate'
 import { RecipientAdressInput } from 'components/layout/RecipientAdressInput'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
 import { Identity } from '@semaphore-protocol/identity'
-import { NftListing } from 'context/AnonExchangeContext'
+import { NftListing, NftStatus } from 'context/AnonExchangeContext'
 import { SemaphoreIdentityVerify } from 'components/SemaphoreIdentityVerify'
+import useAnonExchange from 'hooks/useAnonExchange'
 
 export default function BuyNft() {
   const { address, isConnected } = useAccount()
   const { chain } = useNetwork()
+  const { nftListings, refreshNftListing } = useAnonExchange()
 
   // TODO: initialize NFT list
   const [nfts, setNfts] = useState<NftListing[]>([])
   const [recipient, setRecipient] = useState<string>('')
   const [semaphoreId, setSemaphoreId] = useState<Identity>()
 
+  useEffect(() => {
+    refreshNftListing()
+  }, [refreshNftListing])
+
   if (isConnected && address && chain) {
+    function updateNftStatus(nft: NftListing, newStatus: NftStatus): void {
+      throw new Error('Function not implemented.')
+    }
+
+    function refreshSecret(): void {
+      throw new Error('Function not implemented.')
+    }
+
     return (
       <div>
         <NextSeo title="Buy NFT" />
@@ -38,7 +52,18 @@ export default function BuyNft() {
           NFT Listings
         </Heading>
 
-        {/* <NftList nfts={nfts} chain={chain} /> */}
+        <NftList
+          nfts={nftListings}
+          statusAction={{
+            NotListed: {},
+            Sold: {},
+            Delisted: {},
+            Listed: {},
+          }}
+          chain={chain}
+          identity={semaphoreId}
+          updateNftStatus={updateNftStatus}
+        />
       </div>
     )
   }

@@ -1,4 +1,4 @@
-import { Button, Heading, Flex, Input, InputGroup, InputLeftAddon } from '@chakra-ui/react'
+import { Button, Heading, Flex, Input, InputGroup, InputLeftAddon, useToast } from '@chakra-ui/react'
 import { simpleNftABI } from 'abis'
 import { NftListing } from 'context/AnonExchangeContext'
 import { Dispatch, SetStateAction } from 'react'
@@ -30,10 +30,13 @@ export function ImportNft({
     watch: true,
   })
 
+  const toast = useToast()
+
   const handleImport = () => {
     if (!contractAddressInput || tokenIdInput === null || !isAddress(contractAddressInput)) {
       toast({
         description: 'Invalid input',
+        status: 'error',
       })
       setTokenIdInput(null)
       return
@@ -70,6 +73,7 @@ export function ImportNft({
     } else {
       toast({
         description: 'Not owner of the NFT',
+        status: 'error',
       })
     }
 
@@ -98,7 +102,4 @@ export function ImportNft({
       </Flex>
     </div>
   )
-}
-function toast(arg0: { description: string }) {
-  throw new Error('Function not implemented.')
 }

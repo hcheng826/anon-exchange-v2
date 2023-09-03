@@ -75,7 +75,6 @@ export default function ListNftPage() {
         <NftList
           nfts={nfts}
           statusAction={{
-            // TODO override the buttons
             NotListed: {
               renderButton: semaphoreId
                 ? (nft, chain) => (
