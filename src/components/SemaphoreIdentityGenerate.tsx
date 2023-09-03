@@ -3,17 +3,16 @@ import { Identity } from '@semaphore-protocol/identity'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { generateProof } from '@semaphore-protocol/proof'
 import { useAccount } from 'wagmi'
-import useSemaphore from 'hooks/useSemaphore'
-import { v4 as uuidv4 } from 'uuid'
-import { fstat } from 'fs'
 
 interface Props {
   semaphoreId: Identity | undefined
   setSemaphoreId: Dispatch<SetStateAction<Identity | undefined>>
+  secret: string
+  refreshSecret: () => void
 }
 
 export function SemaphoreIdentityGenerate(props: Props) {
-  const [secret, setSecret] = useState(uuidv4())
+  const { secret, refreshSecret } = props
   const { address } = useAccount()
   const toast = useToast()
 
@@ -25,7 +24,7 @@ export function SemaphoreIdentityGenerate(props: Props) {
   }
 
   const handleRefreshSecret = () => {
-    setSecret(uuidv4())
+    refreshSecret()
   }
 
   return (

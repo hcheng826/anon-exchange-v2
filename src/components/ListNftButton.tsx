@@ -11,9 +11,10 @@ interface ListNFTProps {
   identity: Identity
   updateNftStatus: (nft: NftListing, newStatus: NftStatus) => void
   setSemaphoreId: Dispatch<SetStateAction<Identity | undefined>>
+  refreshSecret: () => void
 }
 
-export function ListNFT({ nft, chain, identity, updateNftStatus, setSemaphoreId }: ListNFTProps) {
+export function ListNFT({ nft, chain, identity, updateNftStatus, setSemaphoreId, refreshSecret }: ListNFTProps) {
   const anonExchangeAddr = anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress]
   const [approved, setApproved] = useState<boolean>(false)
 
@@ -54,8 +55,9 @@ export function ListNFT({ nft, chain, identity, updateNftStatus, setSemaphoreId 
     if (listNftWait.isSuccess) {
       updateNftStatus(nft, 'Listed')
       setSemaphoreId(undefined)
+      refreshSecret()
     }
-  }, [anonExchangeAddr, approvedAddress, listNftWait.isSuccess, nft, setSemaphoreId, updateNftStatus])
+  }, [anonExchangeAddr, approvedAddress, listNftWait.isSuccess, nft, setSemaphoreId, updateNftStatus, refreshSecret])
 
   if (!approved) {
     return <Button onClick={handleApprove}>Approve</Button>

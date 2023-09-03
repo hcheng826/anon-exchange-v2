@@ -11,6 +11,7 @@ import { MintNFT } from 'components/MintNftButton'
 import { ImportNft } from 'components/ImportNftButton'
 import { ListNFT } from 'components/ListNftButton'
 import { DelistNFT } from 'components/DelistNftButton'
+import { v4 as uuidv4 } from 'uuid'
 
 export default function ListNftPage() {
   const { address, isConnected } = useAccount()
@@ -27,6 +28,11 @@ export default function ListNftPage() {
   const [contractAddressInput, setContractAddressInput] = useState<string>('')
   const [tokenIdInput, setTokenIdInput] = useState<number | null>(null)
   const [semaphoreId, setSemaphoreId] = useState<Identity>()
+  const [secret, setSecret] = useState(uuidv4())
+
+  function refreshSecret() {
+    setSecret(uuidv4())
+  }
 
   function updateNftStatus(nft: NftListing, newStatus: NftStatus) {
     const updatedNfts = nfts.map((_nft) =>
@@ -48,7 +54,7 @@ export default function ListNftPage() {
         </Heading>
         <MintNFT address={address} chain={chain} setNfts={setNfts} />
 
-        <SemaphoreIdentityGenerate semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} />
+        <SemaphoreIdentityGenerate semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} secret={secret} refreshSecret={refreshSecret} />
 
         <Heading as="h2" fontSize="2xl" my={4}>
           NFT List
@@ -73,7 +79,14 @@ export default function ListNftPage() {
             NotListed: {
               renderButton: semaphoreId
                 ? (nft, chain) => (
-                    <ListNFT nft={nft} chain={chain} identity={semaphoreId} updateNftStatus={updateNftStatus} setSemaphoreId={setSemaphoreId} />
+                    <ListNFT
+                      nft={nft}
+                      chain={chain}
+                      identity={semaphoreId}
+                      updateNftStatus={updateNftStatus}
+                      setSemaphoreId={setSemaphoreId}
+                      refreshSecret={refreshSecret}
+                    />
                   )
                 : () => <Button disabled={true}>Please generate Semaphore Id first</Button>,
             },
@@ -81,7 +94,14 @@ export default function ListNftPage() {
             Delisted: {
               renderButton: semaphoreId
                 ? (nft, chain) => (
-                    <ListNFT nft={nft} chain={chain} identity={semaphoreId} updateNftStatus={updateNftStatus} setSemaphoreId={setSemaphoreId} />
+                    <ListNFT
+                      nft={nft}
+                      chain={chain}
+                      identity={semaphoreId}
+                      updateNftStatus={updateNftStatus}
+                      setSemaphoreId={setSemaphoreId}
+                      refreshSecret={refreshSecret}
+                    />
                   )
                 : () => <Button disabled={true}>Please generate Semaphore Id first</Button>,
             },

@@ -8,75 +8,8 @@ import { Identity } from '@semaphore-protocol/identity'
 import { ethers } from 'ethers'
 import { SemaphoreIdentityGenerate } from 'components/SemaphoreIdentityGenerate'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
-
-type Deposit = {
-  date: Date
-  semaphoreId: string // replace with Semaphore Identity Type
-}
-
-function DepositETH({ chain, setDeposits }: { chain: Chain; setDeposits: Dispatch<SetStateAction<Deposit[]>> }) {
-  // sign message "user-addr+nonce" to generate semaphore id
-  const prepareContractWrite = usePrepareContractWrite({
-    address: anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress],
-    abi: anonExchangeABI,
-    functionName: 'depositETH',
-    value: ethers.utils.parseEther('0.1').toBigInt(),
-    args: [BigInt(0)],
-  })
-
-  const contractWrite = useContractWrite(prepareContractWrite.config)
-  const waitForTransaction = useWaitForTransaction({ hash: contractWrite.data?.hash })
-
-  const handleSendTransation = () => {
-    contractWrite.write?.()
-  }
-
-  useEffect(() => {
-    if (waitForTransaction.isSuccess) {
-      // Execute your logic here
-      setDeposits((prevDeposits) => [
-        ...prevDeposits,
-        {
-          date: new Date(),
-          semaphoreId: '123',
-        },
-      ])
-    }
-  }, [setDeposits, waitForTransaction.isSuccess])
-
-  return (
-    <div>
-      {!contractWrite.write && <p>Please connect to Sepolia testnet</p>}
-      <Button
-        width="full"
-        disabled={waitForTransaction.isLoading || contractWrite.isLoading || !contractWrite.write}
-        mt={4}
-        onClick={handleSendTransation}>
-        {waitForTransaction.isLoading ? 'Depositing ETH...' : contractWrite.isLoading ? 'Check your wallet' : 'Deposit 0.01 ETH'}
-      </Button>
-      {waitForTransaction.isSuccess && (
-        <div>
-          <Text mt={2} fontSize="lg">
-            Successfully Deposited ETH!
-          </Text>
-          <Text fontSize="lg" fontWeight="bold">
-            <LinkComponent href={`${chain?.blockExplorers?.default.url}/tx/${contractWrite.data?.hash}`}>Check on block explorer</LinkComponent>
-          </Text>
-        </div>
-      )}
-      {waitForTransaction.isError && (
-        <div>
-          <Text mt={2} color="red" fontSize="lg">
-            Error deposited ETH
-          </Text>
-          <Text color="red" fontSize="lg" fontWeight="bold">
-            {waitForTransaction.error?.message}
-          </Text>
-        </div>
-      )}
-    </div>
-  )
-}
+import { Deposit, DepositETH } from 'components/DepositEthButton'
+import { v4 as uuidv4 } from 'uuid'
 
 export default function DepositEth() {
   const { address, isConnected } = useAccount()
@@ -85,6 +18,11 @@ export default function DepositEth() {
   // TODO: initialize NFT list from localStorage
   const [deposits, setDeposits] = useState<Deposit[]>([])
   const [semaphoreId, setSemaphoreId] = useState<Identity>()
+  const [secret, setSecret] = useState(uuidv4())
+
+  function refreshSecret() {
+    setSecret(uuidv4())
+  }
 
   if (isConnected && address && chain) {
     return (
@@ -93,14 +31,23 @@ export default function DepositEth() {
 
         <HeadingComponent as="h2">Deposit ETH</HeadingComponent>
 
-        <SemaphoreIdentityGenerate semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} />
+        <SemaphoreIdentityGenerate semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} secret={secret} refreshSecret={refreshSecret} />
 
         <Heading as="h2" fontSize="2xl" my={4}>
           Deposit ETH
         </Heading>
 
-        {/* TODO: pass in deposits array and add to the list when deposit is successful */}
-        <DepositETH chain={chain} setDeposits={setDeposits} />
+        {semaphoreId ? (
+          <DepositETH
+            chain={chain}
+            setDeposits={setDeposits}
+            semaphoreId={semaphoreId}
+            setSemaphoreId={setSemaphoreId}
+            refreshSecret={refreshSecret}
+          />
+        ) : (
+          <Button disabled={true}>Please generate Semaphore Id first</Button>
+        )}
 
         <Heading as="h2" fontSize="1xl" my={4}>
           Deposit Records
@@ -110,7 +57,7 @@ export default function DepositEth() {
           <Thead>
             <Tr>
               <Th>Date</Th>
-              <Th>Semaphore Id</Th>
+              <Th>Semaphore Id Commitment</Th>
             </Tr>
           </Thead>
           <Tbody>
