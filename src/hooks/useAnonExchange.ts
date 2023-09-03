@@ -1,9 +1,6 @@
-import { NftListedEvent } from './../../contracts/typechain-types/contracts/AnonExchange'
-import { SemaphoreEthers } from '@semaphore-protocol/data'
 import { useCallback, useState } from 'react'
 import { Address, useNetwork } from 'wagmi'
 import { anonExchangeAddress, anonExchangeABI } from 'abis'
-import { ETH_DEPOSITED_GROUP_ID, NFT_SOLD_GROUP_ID, semaphoreStartBlock } from 'utils/config'
 import { AnonExchangeContextType, NftStatus } from 'context/AnonExchangeContext'
 import { ethers } from 'ethers'
 
