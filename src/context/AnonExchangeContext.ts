@@ -9,7 +9,10 @@ export type NftListing = {
   status: NftStatus
 }
 
-type EthDeposit = {}
+export type EthDeposit = {
+  depositer: string
+  timestamp: number
+}
 
 export type AnonExchangeContextType = {
   nftListings: NftListing[]

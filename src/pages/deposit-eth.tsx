@@ -1,24 +1,27 @@
 import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction, useNetwork, Address, Chain } from 'wagmi'
 import { Button, Heading, Text, Flex, Input, Table, Thead, Tr, Th, Tbody, Td, InputGroup, InputLeftAddon } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
-import { LinkComponent } from 'components/layout/LinkComponent'
-import { anonExchangeABI, anonExchangeAddress, simpleNftABI, simpleNftAddress } from 'abis'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Identity } from '@semaphore-protocol/identity'
-import { ethers } from 'ethers'
 import { SemaphoreIdentityGenerate } from 'components/SemaphoreIdentityGenerate'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
 import { Deposit, DepositETH } from 'components/DepositEthButton'
 import { v4 as uuidv4 } from 'uuid'
+import useAnonExchange from 'hooks/useAnonExchange'
 
 export default function DepositEth() {
   const { address, isConnected } = useAccount()
   const { chain } = useNetwork()
+  const { ethDeposits, refreshEthDeposits } = useAnonExchange()
 
   // TODO: initialize NFT list from localStorage
-  const [deposits, setDeposits] = useState<Deposit[]>([])
+  // const [deposits, setDeposits] = useState<Deposit[]>([])
   const [semaphoreId, setSemaphoreId] = useState<Identity>()
   const [secret, setSecret] = useState(uuidv4())
+
+  useEffect(() => {
+    refreshEthDeposits()
+  }, [refreshEthDeposits])
 
   function refreshSecret() {
     setSecret(uuidv4())
@@ -40,7 +43,7 @@ export default function DepositEth() {
         {semaphoreId ? (
           <DepositETH
             chain={chain}
-            setDeposits={setDeposits}
+            // setDeposits={setDeposits}
             semaphoreId={semaphoreId}
             setSemaphoreId={setSemaphoreId}
             refreshSecret={refreshSecret}
@@ -56,17 +59,21 @@ export default function DepositEth() {
         <Table variant="simple">
           <Thead>
             <Tr>
-              <Th>Date</Th>
-              <Th>Semaphore Id Commitment</Th>
+              <Th>id</Th>
+              <Th>timestamp</Th>
             </Tr>
           </Thead>
           <Tbody>
-            {deposits.map((deposit, idx) => (
-              <Tr key={idx}>
-                <Td>{deposit.date.toUTCString()}</Td>
-                <Td>{deposit.semaphoreId.toString()}</Td>
-              </Tr>
-            ))}
+            {ethDeposits
+              .filter((deposit) => {
+                return deposit.depositer === address
+              })
+              .map((deposit, idx) => (
+                <Tr key={idx}>
+                  <Td>{idx}</Td>
+                  <Td>{new Date(deposit.timestamp).toTimeString()}</Td>
+                </Tr>
+              ))}
           </Tbody>
         </Table>
       </div>

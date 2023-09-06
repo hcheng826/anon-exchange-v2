@@ -1,27 +1,13 @@
 import { useCallback, useState } from 'react'
-import { Address, useNetwork } from 'wagmi'
+import { useNetwork } from 'wagmi'
 import { anonExchangeAddress, anonExchangeABI } from 'abis'
-import { AnonExchangeContextType, NftStatus } from 'context/AnonExchangeContext'
+import { AnonExchangeContextType, EthDeposit, NftStatus } from 'context/AnonExchangeContext'
 import { ethers } from 'ethers'
 
-export default function useAnonExchange(address?: Address): AnonExchangeContextType {
+export default function useAnonExchange(): AnonExchangeContextType {
   const [nftListings, setNftListings] = useState<AnonExchangeContextType['nftListings']>([])
   const [ethDeposits, setEthDeposits] = useState<AnonExchangeContextType['ethDeposits']>([])
   const { chain } = useNetwork()
-
-  /**
-  scrape the following smart contract events
-  event NftListed(address lister, address nftAddr, uint256 tokenId);
-  event NftDelisted(address lister, address nftAddr, uint256 tokenId);
-  event NftSold(address lister, address recipient, address nftAddr, uint256 tokenId);
-  event EthDeposited(address depositer);
-  event EthWithdrawn(address recipient);
-  event EthClaimed(address recipient);
-
-  NftListed: add to the ownerNftMap
-  Deflisted: remove from the map
-  Sold: mark status as sold
-  */
 
   const refreshNftListing = useCallback(async (): Promise<void> => {
     if (!chain) {
@@ -102,7 +88,30 @@ export default function useAnonExchange(address?: Address): AnonExchangeContextT
       return
     }
 
-    setEthDeposits([])
+    const anonExchange = new ethers.Contract(
+      anonExchangeAddress[chain?.id as keyof typeof anonExchangeAddress],
+      anonExchangeABI,
+      new ethers.providers.JsonRpcProvider()
+    )
+    const ethDepositfilter = anonExchange.filters['EthDeposited']()
+
+    const events = await anonExchange.queryFilter(ethDepositfilter)
+
+    const depositsPromises = events.map(async (event) => {
+      if (event.args) {
+        const { depositer } = event.args
+        const block = await event.getBlock()
+        return {
+          depositer,
+          timestamp: block.timestamp,
+        }
+      }
+      return null
+    })
+
+    const ethDeposits: EthDeposit[] = (await Promise.all(depositsPromises)).filter((deposit): deposit is EthDeposit => deposit !== null)
+
+    setEthDeposits(ethDeposits)
   }, [chain])
 
   return {

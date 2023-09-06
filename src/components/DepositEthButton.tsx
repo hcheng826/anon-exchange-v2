@@ -16,14 +16,14 @@ export type Deposit = {
 
 interface DepositEthProps {
   chain: Chain
-  setDeposits: Dispatch<SetStateAction<Deposit[]>>
+  // setDeposits: Dispatch<SetStateAction<Deposit[]>>
   semaphoreId: Identity
   setSemaphoreId: Dispatch<SetStateAction<Identity | undefined>>
   refreshSecret: () => void
 }
 
 export function DepositETH(props: DepositEthProps) {
-  const { chain, setDeposits, semaphoreId, setSemaphoreId, refreshSecret } = props
+  const { chain, semaphoreId, setSemaphoreId, refreshSecret } = props
   const { data: nftPrice } = useContractRead({
     address: anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress],
     abi: anonExchangeABI,
@@ -47,17 +47,17 @@ export function DepositETH(props: DepositEthProps) {
 
   useEffect(() => {
     if (waitForTransaction.isSuccess) {
-      setDeposits((prevDeposits) => [
-        ...prevDeposits,
-        {
-          date: new Date(),
-          semaphoreId: semaphoreId.getCommitment().toString(),
-        },
-      ])
+      // setDeposits((prevDeposits) => [
+      //   ...prevDeposits,
+      //   {
+      //     date: new Date(),
+      //     semaphoreId: semaphoreId.getCommitment().toString(),
+      //   },
+      // ])
       setSemaphoreId(undefined)
       refreshSecret()
     }
-  }, [semaphoreId, setDeposits, waitForTransaction.isSuccess, setSemaphoreId, refreshSecret])
+  }, [semaphoreId, waitForTransaction.isSuccess, setSemaphoreId, refreshSecret])
 
   return (
     <div>
