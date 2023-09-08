@@ -10,7 +10,7 @@ export default function useAnonExchange(): AnonExchangeContextType {
   const { chain } = useNetwork()
 
   const refreshNftListing = useCallback(async (): Promise<void> => {
-    if (!chain) {
+    if (!chain || !anonExchangeAddress[chain?.id as keyof typeof anonExchangeAddress]) {
       return
     }
 
@@ -84,7 +84,7 @@ export default function useAnonExchange(): AnonExchangeContextType {
   }, [chain])
 
   const refreshEthDeposits = useCallback(async (): Promise<void> => {
-    if (!chain) {
+    if (!chain || !anonExchangeAddress[chain?.id as keyof typeof anonExchangeAddress]) {
       return
     }
 

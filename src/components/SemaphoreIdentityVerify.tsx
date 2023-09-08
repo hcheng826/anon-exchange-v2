@@ -1,7 +1,7 @@
 import { Heading, Text, Input, Flex, Button, useToast, Alert, AlertIcon, useEditable } from '@chakra-ui/react'
 import { Identity } from '@semaphore-protocol/identity'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { generateProof, verifyProof } from '@semaphore-protocol/proof'
+import { FullProof, generateProof, verifyProof } from '@semaphore-protocol/proof'
 import { useAccount } from 'wagmi'
 import useSemaphore from 'hooks/useSemaphore'
 
@@ -10,12 +10,13 @@ const BUYER_BUY_AND_CLAIM_NFT_SIGNAL = 1
 interface Props {
   semaphoreId: Identity | undefined
   setSemaphoreId: Dispatch<SetStateAction<Identity | undefined>>
-  // secret: string
-  // refreshSecret: () => void
+  setFullProof: Dispatch<SetStateAction<FullProof | undefined>>
+  secret: string
+  setSecret: Dispatch<SetStateAction<string>>
 }
 
 export function SemaphoreIdentityVerify(props: Props) {
-  const [secret, setSecret] = useState('')
+  const { secret, setSecret } = props
   const toast = useToast()
   const { ethDepositedGroup, refreshGroups } = useSemaphore()
 
@@ -40,12 +41,11 @@ export function SemaphoreIdentityVerify(props: Props) {
             toast({ description: 'Invalid Semaphore Identity!', status: 'error' })
           }
         })
+        props.setFullProof(proof)
       })
       .catch((e) => {
         toast({ description: `Error: ${e.message ?? e}`, status: 'error' })
       })
-    // if success, toast and setSemaphoreId
-    // else, show <Alert status="error">
   }
 
   return (

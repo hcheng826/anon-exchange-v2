@@ -19,7 +19,7 @@ interface Props {
   >
   chain: Chain
   identity?: Identity
-  updateNftStatus: (nft: NftListing, newStatus: NftStatus) => void
+  updateNftStatus?: (nft: NftListing, newStatus: NftStatus) => void
 }
 
 export function NftList(props: Props) {

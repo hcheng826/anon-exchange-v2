@@ -13,7 +13,7 @@ export default function useSemaphore(): SemaphoreContextType {
   const { chain } = useNetwork()
 
   const refreshGroups = useCallback(async (): Promise<void> => {
-    if (!chain) {
+    if (!chain || !semaphoreAddress[chain.id as keyof typeof semaphoreAddress]) {
       return
     }
     const semaphore = new SemaphoreEthers(chain.rpcUrls.default.http[0], {

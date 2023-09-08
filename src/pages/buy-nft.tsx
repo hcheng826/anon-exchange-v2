@@ -10,37 +10,46 @@ import { Identity } from '@semaphore-protocol/identity'
 import { NftListing, NftStatus } from 'context/AnonExchangeContext'
 import { SemaphoreIdentityVerify } from 'components/SemaphoreIdentityVerify'
 import useAnonExchange from 'hooks/useAnonExchange'
+import { FullProof } from '@semaphore-protocol/proof'
+import { BuyNFT } from 'components/BuyNftButton'
+import { isAddress } from 'viem'
 
 export default function BuyNft() {
   const { address, isConnected } = useAccount()
   const { chain } = useNetwork()
   const { nftListings, refreshNftListing } = useAnonExchange()
 
-  // TODO: initialize NFT list
-  const [nfts, setNfts] = useState<NftListing[]>([])
   const [recipient, setRecipient] = useState<string>('')
   const [semaphoreId, setSemaphoreId] = useState<Identity>()
+  const [fullProof, setFullProof] = useState<FullProof>()
+  const [secret, setSecret] = useState('')
 
   useEffect(() => {
     refreshNftListing()
+    const interval = setInterval(() => {
+      refreshNftListing()
+    }, 5000)
+    return () => clearInterval(interval)
   }, [refreshNftListing])
 
+  function resetSemaphoreId() {
+    setSemaphoreId(undefined)
+    setSecret('')
+  }
   if (isConnected && address && chain) {
-    function updateNftStatus(nft: NftListing, newStatus: NftStatus): void {
-      throw new Error('Function not implemented.')
-    }
-
-    function refreshSecret(): void {
-      throw new Error('Function not implemented.')
-    }
-
     return (
       <div>
         <NextSeo title="Buy NFT" />
 
         <HeadingComponent as="h2">Buy NFT</HeadingComponent>
 
-        <SemaphoreIdentityVerify semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} />
+        <SemaphoreIdentityVerify
+          semaphoreId={semaphoreId}
+          setSemaphoreId={setSemaphoreId}
+          setFullProof={setFullProof}
+          secret={secret}
+          setSecret={setSecret}
+        />
 
         <RecipientAdressInput {...{ recipient, setRecipient }} />
 
@@ -58,11 +67,24 @@ export default function BuyNft() {
             NotListed: {},
             Sold: {},
             Delisted: {},
-            Listed: {},
+            Listed: {
+              renderButton:
+                fullProof && isAddress(recipient)
+                  ? (nft, chain) => (
+                      <BuyNFT
+                        nft={nft}
+                        chain={chain}
+                        fullProof={fullProof}
+                        resetSemaphoreId={resetSemaphoreId}
+                        recipient={recipient}
+                        setRecipient={setRecipient}
+                      />
+                    )
+                  : () => <Button disabled={true}>Please generate proof and input recipient</Button>,
+            },
           }}
           chain={chain}
           identity={semaphoreId}
-          updateNftStatus={updateNftStatus}
         />
       </div>
     )
