@@ -14,6 +14,7 @@ import { DelistNFT } from 'components/DelistNftButton'
 import { v4 as uuidv4 } from 'uuid'
 import { ApproveAllNFT } from 'components/ApproveAllNftButton'
 import useAnonExchange from 'hooks/useAnonExchange'
+import { ListNftSold } from 'components/ListNftSoldButton'
 
 export default function ListNftPage() {
   const { address, isConnected } = useAccount()
@@ -23,60 +24,56 @@ export default function ListNftPage() {
   const [tokenIdInput, setTokenIdInput] = useState<number | null>(null)
   const [semaphoreId, setSemaphoreId] = useState<Identity>()
   const [secret, setSecret] = useState(uuidv4())
-  const { nftListings, refreshNftListing } = useAnonExchange()
+  const { refreshNftListing } = useAnonExchange()
 
   const [nfts, setNfts] = useState<NftListing[]>([])
 
-  const refreshNfts = useCallback(() => {
-    refreshNftListing()
+  useEffect(() => {
+    const fetchAndSetListings = async () => {
+      const nftListings = await refreshNftListing()
 
-    setNfts((prevNfts) => {
-      const updatedNfts = [...prevNfts]
-      let isChanged = false
+      const updatedNfts = nftListings
+        .filter((nft) => nft.lister === address)
+        .map((nft) => {
+          return nft
+        })
 
-      nftListings.forEach((listing) => {
-        if (listing.lister === address) {
-          const existingIndex = updatedNfts.findIndex((nft) => {
-            return nft.contractAddress === listing.contractAddress && nft.tokenId === listing.tokenId
-          })
+      setNfts((prevNfts) => {
+        const newNfts = [...prevNfts]
 
-          if (existingIndex !== -1) {
-            updatedNfts[existingIndex] = listing
-            isChanged = true
+        updatedNfts.forEach((updatedNft) => {
+          const idx = newNfts.findIndex((nft) => nft.contractAddress === updatedNft.contractAddress && nft.tokenId === updatedNft.tokenId)
+
+          if (idx !== -1) {
+            newNfts[idx] = updatedNft as NftListing
           } else {
-            updatedNfts.push(listing)
-            isChanged = true
+            newNfts.push(updatedNft as NftListing)
           }
-        }
+        })
+
+        return newNfts
       })
+    }
 
-      if (isChanged) {
-        return updatedNfts
-      }
+    fetchAndSetListings() // Call once immediately when component mounts
 
-      return prevNfts
-    })
-  }, [address, nftListings, refreshNftListing])
+    const intervalId = setInterval(fetchAndSetListings, 5000)
 
-  useEffect(() => {
-    refreshNfts()
-  }, [])
-
-  useEffect(() => {
-    const interval = setInterval(refreshNfts, 5000)
-    return () => clearInterval(interval)
-  }, [refreshNfts])
-
+    return () => clearInterval(intervalId) // Cleanup interval when component unmounts
+  }, [address, refreshNftListing])
   function refreshSecret() {
     setSecret(uuidv4())
   }
 
-  function updateNftStatus(nft: NftListing, newStatus: NftStatus) {
-    const updatedNfts = nfts.map((_nft) =>
-      nft.tokenId === _nft.tokenId && nft.contractAddress === _nft.contractAddress ? { ...nft, status: newStatus } : nft
+  function updateNftStatus(nftToUpdate: NftListing, newStatus: NftStatus) {
+    setNfts((currentNfts) =>
+      currentNfts.map((nft) => {
+        if (nftToUpdate.tokenId === nft.tokenId && nftToUpdate.contractAddress === nft.contractAddress) {
+          return { ...nft, status: newStatus }
+        }
+        return nft
+      })
     )
-
-    setNfts(updatedNfts)
   }
 
   if (isConnected && address && chain) {
@@ -127,7 +124,7 @@ export default function ListNftPage() {
                   )
                 : () => <Button disabled={true}>Please generate Semaphore Id first</Button>,
             },
-            Sold: {},
+            Sold: { renderButton: (nft) => <ListNftSold nft={nft} updateNftStatus={updateNftStatus} /> },
             Delisted: {
               renderButton: semaphoreId
                 ? (nft, chain) => (

@@ -28,6 +28,12 @@ export function ImportNft({
     functionName: 'ownerOf',
     args: [BigInt(tokenIdInput || 0)],
     watch: true,
+    onError: () => {
+      toast({
+        description: 'Invalid NFT address',
+        status: 'error',
+      })
+    },
   })
 
   const toast = useToast()
