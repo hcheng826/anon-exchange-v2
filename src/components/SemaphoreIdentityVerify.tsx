@@ -2,7 +2,6 @@ import { Heading, Text, Input, Flex, Button, useToast, Alert, AlertIcon, useEdit
 import { Identity } from '@semaphore-protocol/identity'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { FullProof, generateProof, verifyProof } from '@semaphore-protocol/proof'
-import { useAccount } from 'wagmi'
 import useSemaphore from 'hooks/useSemaphore'
 
 const BUYER_BUY_AND_CLAIM_NFT_SIGNAL = 1
@@ -19,12 +18,15 @@ export function SemaphoreIdentityVerify(props: Props) {
   const { secret, setSecret } = props
   const toast = useToast()
   const { ethDepositedGroup, refreshGroups } = useSemaphore()
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     refreshGroups()
   }, [refreshGroups])
 
   const handleConfirmSecret = () => {
+    setLoading(true)
+
     const identity = new Identity(secret)
 
     if (!ethDepositedGroup) {
@@ -46,6 +48,9 @@ export function SemaphoreIdentityVerify(props: Props) {
       .catch((e) => {
         toast({ description: `Error: ${e.message ?? e}`, status: 'error' })
       })
+      .finally(() => {
+        setLoading(false)
+      })
   }
 
   return (
@@ -58,7 +63,7 @@ export function SemaphoreIdentityVerify(props: Props) {
       <Flex align="center" mb={4} direction="column">
         <Flex align="center" mb={2} width="100%">
           <Input type="text" value={secret} onChange={(e) => setSecret(e.target.value)} mr={2} disabled={props.semaphoreId !== undefined} />
-          <Button onClick={handleConfirmSecret} ml={2} disabled={props.semaphoreId !== undefined}>
+          <Button onClick={handleConfirmSecret} ml={2} disabled={props.semaphoreId !== undefined || loading} isLoading={loading}>
             Confirm
           </Button>
           <Button
@@ -73,7 +78,7 @@ export function SemaphoreIdentityVerify(props: Props) {
         {props.semaphoreId !== undefined && (
           <Alert status="success">
             <AlertIcon />
-            Semaphore Identity verified successfully with secret: {secret}.
+            Semaphore Identity verified successfully with secret: <br /> {secret}
           </Alert>
         )}
       </Flex>
