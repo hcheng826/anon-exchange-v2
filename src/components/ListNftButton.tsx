@@ -1,4 +1,4 @@
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, Address, Chain, useContractRead } from 'wagmi'
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, Address, Chain, useContractRead, useAccount } from 'wagmi'
 import { Button } from '@chakra-ui/react'
 import { anonExchangeABI, anonExchangeAddress, simpleNftABI, simpleNftAddress } from 'abis'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
@@ -17,6 +17,7 @@ interface ListNFTProps {
 export function ListNFT({ nft, chain, identity, updateNftStatus, setSemaphoreId, refreshSecret }: ListNFTProps) {
   const anonExchangeAddr = anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress]
   const [approved, setApproved] = useState<boolean>(false)
+  const { address } = useAccount()
 
   // check approval
   const { data: approvedAddress } = useContractRead({
@@ -24,6 +25,14 @@ export function ListNFT({ nft, chain, identity, updateNftStatus, setSemaphoreId,
     abi: simpleNftABI,
     functionName: 'getApproved',
     args: [BigInt(nft.tokenId)],
+    watch: true,
+  })
+
+  const { data: isApprovedForAll } = useContractRead({
+    address: nft.contractAddress as Address,
+    abi: simpleNftABI,
+    functionName: 'isApprovedForAll',
+    args: [address || '0x', anonExchangeAddr],
     watch: true,
   })
 
@@ -51,13 +60,13 @@ export function ListNFT({ nft, chain, identity, updateNftStatus, setSemaphoreId,
   }
 
   useEffect(() => {
-    setApproved(approvedAddress === anonExchangeAddr)
+    setApproved(approvedAddress === anonExchangeAddr || !!isApprovedForAll)
     if (listNftWait.isSuccess) {
       updateNftStatus(nft, 'Listed')
       setSemaphoreId(undefined)
       refreshSecret()
     }
-  }, [anonExchangeAddr, approvedAddress, listNftWait.isSuccess, nft, setSemaphoreId, updateNftStatus, refreshSecret])
+  }, [anonExchangeAddr, approvedAddress, listNftWait.isSuccess, nft, setSemaphoreId, updateNftStatus, refreshSecret, isApprovedForAll])
 
   if (!approved) {
     return <Button onClick={handleApprove}>Approve</Button>

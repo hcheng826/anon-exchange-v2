@@ -1,11 +1,13 @@
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, Address, Chain, useContractRead } from 'wagmi'
-import { Button, Text } from '@chakra-ui/react'
+import { Alert, AlertDescription, AlertIcon, AlertTitle, Button, Link, Text, Toast, useToast } from '@chakra-ui/react'
 import { LinkComponent } from 'components/layout/LinkComponent'
 import { simpleNftABI, simpleNftAddress } from 'abis'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { NftListing } from 'context/AnonExchangeContext'
 
 export function MintNFT({ address, chain, setNfts }: { address: Address; chain: Chain; setNfts: Dispatch<SetStateAction<NftListing[]>> }) {
+  const toast = useToast()
+
   const { refetch: tokenIdRefetch } = useContractRead({
     address: simpleNftAddress[chain?.id as keyof typeof simpleNftAddress],
     abi: simpleNftABI,
@@ -29,6 +31,7 @@ export function MintNFT({ address, chain, setNfts }: { address: Address; chain: 
 
   useEffect(() => {
     if (waitForTransaction.isSuccess) {
+      toast({ description: 'Successfully Minted NFT!' })
       tokenIdRefetch().then(({ data: tokenId }) => {
         setNfts((prevNfts) => [
           ...prevNfts,
@@ -40,7 +43,7 @@ export function MintNFT({ address, chain, setNfts }: { address: Address; chain: 
         ])
       })
     }
-  }, [chain.id, setNfts, tokenIdRefetch, waitForTransaction.isSuccess])
+  }, [chain.id, setNfts, toast, tokenIdRefetch, waitForTransaction.isSuccess])
 
   return (
     <div>
@@ -54,24 +57,26 @@ export function MintNFT({ address, chain, setNfts }: { address: Address; chain: 
         {waitForTransaction.isLoading ? 'Minting NFT...' : safeMintWrite.isLoading ? 'Check your wallet' : 'Mint Test NFT'}
       </Button>
       {waitForTransaction.isSuccess && (
-        <div>
-          <Text mt={2} fontSize="lg">
-            Successfully Minted NFT!
-          </Text>
-          <Text fontSize="lg" fontWeight="bold">
-            <LinkComponent href={`${chain?.blockExplorers?.default.url}/tx/${safeMintWrite.data?.hash}`}>Check on block explorer</LinkComponent>
-          </Text>
-        </div>
+        <Alert status="success" mt={2}>
+          <AlertIcon />
+          <AlertTitle>Successfully Minted NFT!</AlertTitle>
+          <AlertDescription>
+            <Text>
+              <Link href={`${chain?.blockExplorers?.default.url}/tx/${safeMintWrite.data?.hash}`} isExternal>
+                Check on block explorer
+              </Link>
+            </Text>
+          </AlertDescription>
+        </Alert>
       )}
       {waitForTransaction.isError && (
-        <div>
-          <Text mt={2} color="red" fontSize="lg">
-            Error minting NFT
-          </Text>
-          <Text color="red" fontSize="lg" fontWeight="bold">
-            {waitForTransaction.error?.message}
-          </Text>
-        </div>
+        <Alert status="error" mt={2}>
+          <AlertIcon />
+          <AlertTitle>Error minting NFT</AlertTitle>
+          <AlertDescription>
+            <Text>{waitForTransaction.error?.message}</Text>
+          </AlertDescription>
+        </Alert>
       )}
     </div>
   )

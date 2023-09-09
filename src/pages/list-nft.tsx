@@ -12,6 +12,7 @@ import { ImportNft } from 'components/ImportNftButton'
 import { ListNFT } from 'components/ListNftButton'
 import { DelistNFT } from 'components/DelistNftButton'
 import { v4 as uuidv4 } from 'uuid'
+import { ApproveAllNFT } from 'components/ApproveAllNftButton'
 
 export default function ListNftPage() {
   const { address, isConnected } = useAccount()
@@ -53,6 +54,7 @@ export default function ListNftPage() {
           Mint Test NFT
         </Heading>
         <MintNFT address={address} chain={chain} setNfts={setNfts} />
+        <ApproveAllNFT chain={chain} />
 
         <SemaphoreIdentityGenerate semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} secret={secret} refreshSecret={refreshSecret} />
 
