@@ -68,7 +68,8 @@ export function SemaphoreIdentityGenerate(props: Props) {
         {props.semaphoreId !== undefined && (
           <Alert status="success">
             <AlertIcon />
-            Semaphore Identity created successfully with secret: {secret} (note it down, it will NOT appear again)
+            Semaphore Identity created successfully with secret: <br /> {secret} <br /> Note it down before you list NFT or deposit ETH, it will
+            refresh and will NOT appear again
           </Alert>
         )}
       </Flex>

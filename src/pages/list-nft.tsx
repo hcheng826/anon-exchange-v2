@@ -1,7 +1,7 @@
 import { useAccount, useNetwork } from 'wagmi'
-import { Button, Heading } from '@chakra-ui/react'
+import { Button, Heading, list } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { NftList } from 'components/NftList'
 import { SemaphoreIdentityGenerate } from 'components/SemaphoreIdentityGenerate'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
@@ -13,23 +13,59 @@ import { ListNFT } from 'components/ListNftButton'
 import { DelistNFT } from 'components/DelistNftButton'
 import { v4 as uuidv4 } from 'uuid'
 import { ApproveAllNFT } from 'components/ApproveAllNftButton'
+import useAnonExchange from 'hooks/useAnonExchange'
 
 export default function ListNftPage() {
   const { address, isConnected } = useAccount()
   const { chain } = useNetwork()
 
-  const nftListings: NftListing[] = []
-
-  const [nfts, setNfts] = useState<NftListing[]>(
-    nftListings.filter((listing) => {
-      return listing.lister && listing.lister === address
-    })
-  )
-
   const [contractAddressInput, setContractAddressInput] = useState<string>('')
   const [tokenIdInput, setTokenIdInput] = useState<number | null>(null)
   const [semaphoreId, setSemaphoreId] = useState<Identity>()
   const [secret, setSecret] = useState(uuidv4())
+  const { nftListings, refreshNftListing } = useAnonExchange()
+
+  const [nfts, setNfts] = useState<NftListing[]>([])
+
+  const refreshNfts = useCallback(() => {
+    refreshNftListing()
+
+    setNfts((prevNfts) => {
+      const updatedNfts = [...prevNfts]
+      let isChanged = false
+
+      nftListings.forEach((listing) => {
+        if (listing.lister === address) {
+          const existingIndex = updatedNfts.findIndex((nft) => {
+            return nft.contractAddress === listing.contractAddress && nft.tokenId === listing.tokenId
+          })
+
+          if (existingIndex !== -1) {
+            updatedNfts[existingIndex] = listing
+            isChanged = true
+          } else {
+            updatedNfts.push(listing)
+            isChanged = true
+          }
+        }
+      })
+
+      if (isChanged) {
+        return updatedNfts
+      }
+
+      return prevNfts
+    })
+  }, [address, nftListings, refreshNftListing])
+
+  useEffect(() => {
+    refreshNfts()
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(refreshNfts, 5000)
+    return () => clearInterval(interval)
+  }, [refreshNfts])
 
   function refreshSecret() {
     setSecret(uuidv4())
