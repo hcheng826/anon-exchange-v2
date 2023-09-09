@@ -2,26 +2,23 @@ import { Chain, sepolia } from 'wagmi'
 import { Button, useToast } from '@chakra-ui/react'
 import { anonExchangeABI, anonExchangeAddress } from 'abis'
 import { useState } from 'react'
-import { NftListing } from 'context/AnonExchangeContext'
 import { localhost } from 'viem/chains'
 import { ContractTransaction, ethers } from 'ethers'
 import { FullProof } from '@semaphore-protocol/proof'
 import { decodeError } from 'ethers-decode-error'
 
 interface BuyNFTProps {
-  nft: NftListing
-  chain: Chain
   fullProof: FullProof
-  resetSemaphoreId: () => void
+  // resetSemaphoreId: () => void
   recipient: string
-  updateNfts: () => void
 }
 
-export function BuyNFT({ nft, chain, fullProof, resetSemaphoreId, recipient, updateNfts }: BuyNFTProps) {
+export function ClaimEthButton({ fullProof /*, resetSemaphoreId*/, recipient }: BuyNFTProps) {
+  const chain: Chain = process.env.NEXT_PUBLIC_USE_LOCALHOST ? localhost : sepolia
   const toast = useToast()
   const [loading, setLoading] = useState(false)
 
-  function buyNftLocalhost() {
+  function claimEthLocalhost() {
     setLoading(true)
     if (!process.env.NEXT_PUBLIC_LOCAL_RELAYER_PRIVATE_KEY) {
       console.error('NEXT_PUBLIC_LOCAL_RELAYER_PRIVATE_KEY undefined')
@@ -38,25 +35,23 @@ export function BuyNFT({ nft, chain, fullProof, resetSemaphoreId, recipient, upd
     try {
       // callStatic for tx simulation
       anonExchange.callStatic
-        .buyAndClaimNFT(nft.contractAddress, nft.tokenId, fullProof.merkleTreeRoot, fullProof.nullifierHash, fullProof.proof, recipient)
+        .claimETH(recipient, fullProof.merkleTreeRoot, fullProof.nullifierHash, fullProof.proof)
         .then((tx: ContractTransaction) => {
           // inner call to actually submit the tx
-          anonExchange
-            .buyAndClaimNFT(nft.contractAddress, nft.tokenId, fullProof.merkleTreeRoot, fullProof.nullifierHash, fullProof.proof, recipient)
-            .then((tx: ContractTransaction) => {
-              tx.wait().then((rc) => {
-                toast({
-                  status: 'success',
-                  description: `Success! check on block explorer: ${chain?.blockExplorers?.default.url}/tx/${rc.transactionHash}`,
-                })
-                updateNfts()
-                setLoading(false)
-                // resetSemaphoreId()
+          anonExchange.claimETH(recipient, fullProof.merkleTreeRoot, fullProof.nullifierHash, fullProof.proof).then((tx: ContractTransaction) => {
+            tx.wait().then((rc) => {
+              toast({
+                status: 'success',
+                description: `Success! check on block explorer: ${chain?.blockExplorers?.default.url}/tx/${rc.transactionHash}`,
               })
+              setLoading(false)
+              // resetSemaphoreId()
             })
+          })
         })
         .catch((e) => {
           const err = decodeError(e)
+          console.log(err)
 
           let toastErrorMsg = ''
           if (err.error === 'ERC721: transfer to non ERC721Receiver implementer') {
@@ -64,7 +59,7 @@ export function BuyNFT({ nft, chain, fullProof, resetSemaphoreId, recipient, upd
           } else if (err.error === '0x948d0674') {
             toastErrorMsg = 'Semaphore Id has been used'
           } else {
-            toastErrorMsg = 'Unknown error'
+            toastErrorMsg = `Unknown error: ${err.error}`
           }
 
           toast({ status: 'error', description: toastErrorMsg })
@@ -76,23 +71,23 @@ export function BuyNFT({ nft, chain, fullProof, resetSemaphoreId, recipient, upd
     }
   }
 
-  function buyNftSepolia() {
+  function claimEthSepolia() {
     // call OZ defender
   }
 
   const handleBuyNft = () => {
     if (chain.id === localhost.id) {
-      buyNftLocalhost()
+      claimEthLocalhost()
     } else if (chain.id === sepolia.id) {
-      buyNftSepolia()
+      claimEthSepolia()
     } else {
       toast({ description: 'unsupported chain', status: 'error' })
     }
   }
 
   return (
-    <Button onClick={handleBuyNft} isLoading={loading}>
-      Buy
+    <Button onClick={handleBuyNft} isLoading={loading} mt={2} width={'full'}>
+      Claim ETH
     </Button>
   )
 }

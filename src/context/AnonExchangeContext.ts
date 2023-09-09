@@ -2,6 +2,12 @@ import React from 'react'
 
 export type NftStatus = 'NotListed' | 'Listed' | 'Delisted' | 'Sold'
 
+export enum Signal {
+  BUYER_WITHDRAW_UNSPENT_ETH = 0,
+  BUYER_BUY_AND_CLAIM_NFT = 1,
+  SELLER_CLAIM_ETH = 2,
+}
+
 export type NftListing = {
   lister?: string
   contractAddress: string

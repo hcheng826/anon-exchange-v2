@@ -3,8 +3,7 @@ import { Identity } from '@semaphore-protocol/identity'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { FullProof, generateProof, verifyProof } from '@semaphore-protocol/proof'
 import useSemaphore from 'hooks/useSemaphore'
-
-const BUYER_BUY_AND_CLAIM_NFT_SIGNAL = 1
+import { Signal } from 'context/AnonExchangeContext'
 
 interface Props {
   semaphoreId: Identity | undefined
@@ -12,12 +11,13 @@ interface Props {
   setFullProof: Dispatch<SetStateAction<FullProof | undefined>>
   secret: string
   setSecret: Dispatch<SetStateAction<string>>
+  signal: Signal
 }
 
 export function SemaphoreIdentityVerify(props: Props) {
-  const { secret, setSecret } = props
+  const { secret, setSecret, signal } = props
   const toast = useToast()
-  const { ethDepositedGroup, refreshGroups } = useSemaphore()
+  const { ethDepositedGroup, nftSoldGroup, refreshGroups } = useSemaphore()
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -29,11 +29,14 @@ export function SemaphoreIdentityVerify(props: Props) {
 
     const identity = new Identity(secret)
 
-    if (!ethDepositedGroup) {
+    const group = signal === Signal.BUYER_BUY_AND_CLAIM_NFT ? ethDepositedGroup : nftSoldGroup
+
+    if (!group) {
+      setLoading(false)
       return
     }
 
-    generateProof(identity, ethDepositedGroup, ethDepositedGroup.id, BUYER_BUY_AND_CLAIM_NFT_SIGNAL)
+    generateProof(identity, group, group.id, signal)
       .then((proof) => {
         verifyProof(proof, 20).then((success) => {
           if (success) {

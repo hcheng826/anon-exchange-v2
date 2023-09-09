@@ -1,16 +1,17 @@
-import { GroupResponse, SemaphoreEthers } from '@semaphore-protocol/data'
+import { SemaphoreEthers } from '@semaphore-protocol/data'
 import { useCallback, useState } from 'react'
 import { SemaphoreContextType } from '../context/SemaphoreContext'
-import { useNetwork } from 'wagmi'
+import { sepolia } from 'wagmi'
 import { semaphoreAddress } from 'abis'
 import { ETH_DEPOSITED_GROUP_ID, NFT_SOLD_GROUP_ID, semaphoreStartBlock } from 'utils/config'
 import { Group } from '@semaphore-protocol/group'
+import { localhost } from 'viem/chains'
 
 export default function useSemaphore(): SemaphoreContextType {
   const [nftSoldGroup, setNftSoldGroup] = useState<Group>()
   const [ethDepositedGroup, setEthDepositedGroup] = useState<Group>()
   // need to get eth depositer nonce as well
-  const { chain } = useNetwork()
+  const chain = process.env.NEXT_PUBLIC_USE_LOCALHOST ? localhost : sepolia
 
   const refreshGroups = useCallback(async (): Promise<void> => {
     if (!chain || !semaphoreAddress[chain.id as keyof typeof semaphoreAddress]) {

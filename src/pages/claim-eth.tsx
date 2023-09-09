@@ -1,41 +1,44 @@
-import { Address, useAccount, useNetwork } from 'wagmi'
-import { Button, Heading } from '@chakra-ui/react'
+import { Button, Text } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
 import { useState } from 'react'
-// import { SemaphoreIdentitySecretInput } from 'components/SemaphoreIdentityGenerate'
 import { RecipientAdressInput } from 'components/layout/RecipientAdressInput'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
 import { Identity } from '@semaphore-protocol/identity'
+import { SemaphoreIdentityVerify } from 'components/SemaphoreIdentityVerify'
+import { FullProof } from '@semaphore-protocol/proof'
+import { Signal } from 'context/AnonExchangeContext'
+import { ClaimEthButton } from 'components/ClaimEthButton'
 
 export default function ClaimEth() {
-  const { address, isConnected } = useAccount()
-  const { chain } = useNetwork()
-
   const [recipient, setRecipient] = useState<string>('')
   const [semaphoreId, setSemaphoreId] = useState<Identity>()
+  const [fullProof, setFullProof] = useState<FullProof>()
+  const [secret, setSecret] = useState('')
 
-  if (isConnected && address && chain) {
-    return (
-      <div>
-        <NextSeo title="Claim ETH" />
+  return (
+    <div>
+      <NextSeo title="Claim ETH" />
 
-        <HeadingComponent as="h2">Claim ETH</HeadingComponent>
+      <HeadingComponent as="h2">Claim ETH</HeadingComponent>
+      <Text>{"Note that you don't need to connect a wallet to perform operations on this page"}</Text>
+      <SemaphoreIdentityVerify
+        semaphoreId={semaphoreId}
+        setSemaphoreId={setSemaphoreId}
+        setFullProof={setFullProof}
+        secret={secret}
+        setSecret={setSecret}
+        signal={Signal.SELLER_CLAIM_ETH}
+      />
 
-        {/* <SemaphoreIdentitySecretInput semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} /> */}
+      <RecipientAdressInput {...{ recipient, setRecipient }} />
 
-        <RecipientAdressInput {...{ recipient, setRecipient }} />
-
-        <Button
-          width="full"
-          // disabled={waitForTransaction.isLoading || contractWrite.isLoading || !contractWrite.write}
-          mt={4}
-          // onClick={handleSendTransation}
-        >
-          Claim
+      {fullProof ? (
+        <ClaimEthButton fullProof={fullProof} recipient={recipient} />
+      ) : (
+        <Button mt={2} disabled={true} width={'full'}>
+          Input secret to generate Proof before you can claim ETH
         </Button>
-      </div>
-    )
-  }
-
-  return <div>Connect your wallet first to deposit ETH.</div>
+      )}
+    </div>
+  )
 }

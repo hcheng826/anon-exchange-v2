@@ -1,11 +1,11 @@
 import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction, useNetwork, Address, Chain } from 'wagmi'
 import { Button, Heading, Text, Flex, Input, Table, Thead, Tr, Th, Tbody, Td, InputGroup, InputLeftAddon } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Identity } from '@semaphore-protocol/identity'
 import { SemaphoreIdentityGenerate } from 'components/SemaphoreIdentityGenerate'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
-import { Deposit, DepositETH } from 'components/DepositEthButton'
+import { DepositETH } from 'components/DepositEthButton'
 import { v4 as uuidv4 } from 'uuid'
 import useAnonExchange from 'hooks/useAnonExchange'
 
@@ -14,8 +14,6 @@ export default function DepositEth() {
   const { chain } = useNetwork()
   const { ethDeposits, refreshEthDeposits } = useAnonExchange()
 
-  // TODO: initialize NFT list from localStorage
-  // const [deposits, setDeposits] = useState<Deposit[]>([])
   const [semaphoreId, setSemaphoreId] = useState<Identity>()
   const [secret, setSecret] = useState(uuidv4())
 
@@ -49,7 +47,9 @@ export default function DepositEth() {
             refreshSecret={refreshSecret}
           />
         ) : (
-          <Button disabled={true}>Please generate Semaphore Id first</Button>
+          <Button disabled={true} width={'full'}>
+            Please generate Semaphore Id first
+          </Button>
         )}
 
         <Heading as="h2" fontSize="1xl" my={4}>
