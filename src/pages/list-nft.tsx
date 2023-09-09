@@ -1,7 +1,7 @@
-import { useAccount, useNetwork } from 'wagmi'
+import { Address, useAccount, useNetwork } from 'wagmi'
 import { Button, Heading, list } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { NftList } from 'components/NftList'
 import { SemaphoreIdentityGenerate } from 'components/SemaphoreIdentityGenerate'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
@@ -15,6 +15,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { ApproveAllNFT } from 'components/ApproveAllNftButton'
 import useAnonExchange from 'hooks/useAnonExchange'
 import { ListNftSold } from 'components/ListNftSoldButton'
+import { ethers } from 'ethers'
+import { simpleNftABI } from 'abis'
 
 export default function ListNftPage() {
   const { address, isConnected } = useAccount()
@@ -38,20 +40,42 @@ export default function ListNftPage() {
           return nft
         })
 
-      setNfts((prevNfts) => {
-        const newNfts = [...prevNfts]
+      const updateNftsPromises = updatedNfts.map((updatedNft) => {
+        if (updatedNft.status === 'Sold') {
+          const nftContract = new ethers.Contract(
+            updatedNft.contractAddress,
+            simpleNftABI,
+            new ethers.providers.JsonRpcProvider(chain?.rpcUrls.default.http[0])
+          )
 
-        updatedNfts.forEach((updatedNft) => {
-          const idx = newNfts.findIndex((nft) => nft.contractAddress === updatedNft.contractAddress && nft.tokenId === updatedNft.tokenId)
+          return nftContract.ownerOf(updatedNft.tokenId).then((owner: Address) => {
+            if (owner === address) {
+              updatedNft.status = 'NotListed'
+            }
+            return updatedNft
+          })
+        } else {
+          return Promise.resolve(updatedNft)
+        }
+      })
 
-          if (idx !== -1) {
-            newNfts[idx] = updatedNft as NftListing
-          } else {
-            newNfts.push(updatedNft as NftListing)
-          }
+      Promise.all(updateNftsPromises).then((resolvedNfts) => {
+        setNfts((prevNfts) => {
+          const newNftsArray = [...prevNfts]
+
+          resolvedNfts.forEach((nft) => {
+            const idx = newNftsArray.findIndex(
+              (currentNft) => currentNft.contractAddress === nft.contractAddress && currentNft.tokenId === nft.tokenId
+            )
+            if (idx !== -1) {
+              newNftsArray[idx] = nft
+            } else {
+              newNftsArray.push(nft)
+            }
+          })
+
+          return newNftsArray
         })
-
-        return newNfts
       })
     }
 
@@ -60,7 +84,7 @@ export default function ListNftPage() {
     const intervalId = setInterval(fetchAndSetListings, 5000)
 
     return () => clearInterval(intervalId) // Cleanup interval when component unmounts
-  }, [address, refreshNftListing])
+  }, [address, refreshNftListing, chain])
   function refreshSecret() {
     setSecret(uuidv4())
   }
