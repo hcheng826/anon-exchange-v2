@@ -1,4 +1,3 @@
-import { sepolia } from 'wagmi'
 import { Button, Text, Heading } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
 import { NftList } from 'components/NftList'
@@ -12,7 +11,7 @@ import useAnonExchange from 'hooks/useAnonExchange'
 import { FullProof } from '@semaphore-protocol/proof'
 import { BuyNFT } from 'components/BuyNftButton'
 import { isAddress } from 'viem'
-import { localhost } from 'viem/chains'
+import { chainInUse } from 'utils/config'
 
 export default function BuyNft() {
   const { refreshNftListing } = useAnonExchange()
@@ -22,6 +21,8 @@ export default function BuyNft() {
   const [fullProof, setFullProof] = useState<FullProof>()
   const [secret, setSecret] = useState('')
   const [nfts, setNfts] = useState<NftListing[]>([])
+
+  const chain = chainInUse
 
   function updateNfts() {
     refreshNftListing().then((nftListings) => {
@@ -85,7 +86,7 @@ export default function BuyNft() {
                 : () => <Button disabled={true}>Please generate proof and input recipient</Button>,
           },
         }}
-        chain={process.env.NEXT_PUBLIC_USE_LOCALHOST ? localhost : sepolia}
+        chain={chain}
         identity={semaphoreId}
       />
     </div>

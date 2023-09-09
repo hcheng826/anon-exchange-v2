@@ -78,6 +78,7 @@ export function BuyNFT({ nft, chain, fullProof, resetSemaphoreId, recipient, upd
 
   function buyNftSepolia() {
     // call OZ defender
+    console.log('sepolia')
   }
 
   const handleBuyNft = () => {

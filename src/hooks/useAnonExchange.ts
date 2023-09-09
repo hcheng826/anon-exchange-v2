@@ -1,13 +1,13 @@
 import { useCallback, useState } from 'react'
-import { useNetwork } from 'wagmi'
 import { anonExchangeAddress, anonExchangeABI } from 'abis'
 import { AnonExchangeContextType, EthDeposit, NftListing, NftStatus } from 'context/AnonExchangeContext'
 import { ethers } from 'ethers'
+import { chainInUse } from 'utils/config'
 
 export default function useAnonExchange(): AnonExchangeContextType {
   const [nftListings, setNftListings] = useState<AnonExchangeContextType['nftListings']>([])
   const [ethDeposits, setEthDeposits] = useState<AnonExchangeContextType['ethDeposits']>([])
-  const { chain } = useNetwork()
+  const chain = chainInUse
 
   const refreshNftListing = useCallback(async (): Promise<NftListing[]> => {
     if (!chain || !anonExchangeAddress[chain?.id as keyof typeof anonExchangeAddress]) {

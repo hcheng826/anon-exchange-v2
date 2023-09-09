@@ -6,6 +6,7 @@ import { localhost } from 'viem/chains'
 import { ContractTransaction, ethers } from 'ethers'
 import { FullProof } from '@semaphore-protocol/proof'
 import { decodeError } from 'ethers-decode-error'
+import { chainInUse } from 'utils/config'
 
 interface BuyNFTProps {
   fullProof: FullProof
@@ -14,7 +15,7 @@ interface BuyNFTProps {
 }
 
 export function ClaimEthButton({ fullProof /*, resetSemaphoreId*/, recipient }: BuyNFTProps) {
-  const chain: Chain = process.env.NEXT_PUBLIC_USE_LOCALHOST ? localhost : sepolia
+  const chain: Chain = chainInUse
   const toast = useToast()
   const [loading, setLoading] = useState(false)
 
