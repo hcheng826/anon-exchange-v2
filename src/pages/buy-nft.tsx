@@ -70,16 +70,7 @@ export default function BuyNft() {
             Listed: {
               renderButton:
                 fullProof && isAddress(recipient)
-                  ? (nft, chain) => (
-                      <BuyNFT
-                        nft={nft}
-                        chain={chain}
-                        fullProof={fullProof}
-                        resetSemaphoreId={resetSemaphoreId}
-                        recipient={recipient}
-                        setRecipient={setRecipient}
-                      />
-                    )
+                  ? (nft, chain) => <BuyNFT nft={nft} chain={chain} fullProof={fullProof} resetSemaphoreId={resetSemaphoreId} recipient={recipient} />
                   : () => <Button disabled={true}>Please generate proof and input recipient</Button>,
             },
           }}
