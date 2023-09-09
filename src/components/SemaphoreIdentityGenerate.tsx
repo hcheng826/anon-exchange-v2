@@ -1,6 +1,8 @@
-import { Heading, Text, Input, Flex, Button, useToast, Alert, AlertIcon } from '@chakra-ui/react'
+import { Heading, Text, Input, Flex, Button, useToast, Alert, AlertIcon, IconButton } from '@chakra-ui/react'
 import { Identity } from '@semaphore-protocol/identity'
 import { Dispatch, SetStateAction, useState } from 'react'
+import { CopyIcon, CheckIcon } from '@chakra-ui/icons'
+import { useClipboard } from '@chakra-ui/hooks'
 
 interface Props {
   semaphoreId: Identity | undefined
@@ -12,6 +14,8 @@ interface Props {
 export function SemaphoreIdentityGenerate(props: Props) {
   const { secret, refreshSecret } = props
   const toast = useToast()
+  const { hasCopied, onCopy } = useClipboard(secret)
+  const [showCheckIcon, setShowCheckIcon] = useState(false)
 
   const handleConfirmSecret = () => {
     const identity = new Identity(secret)
@@ -21,6 +25,12 @@ export function SemaphoreIdentityGenerate(props: Props) {
 
   const handleRefreshSecret = () => {
     refreshSecret()
+  }
+
+  const handleCopy = () => {
+    onCopy()
+    setShowCheckIcon(true)
+    setTimeout(() => setShowCheckIcon(false), 2000) // Change icon back to copy after 2 seconds
   }
 
   return (
@@ -39,6 +49,13 @@ export function SemaphoreIdentityGenerate(props: Props) {
           <Button onClick={handleConfirmSecret} ml={2} disabled={props.semaphoreId !== undefined}>
             Confirm
           </Button>
+          <IconButton
+            aria-label="Copy to clipboard"
+            icon={showCheckIcon ? <CheckIcon /> : <CopyIcon />}
+            onClick={handleCopy}
+            ml={2}
+            disabled={props.semaphoreId === undefined}
+          />
           <Button
             onClick={() => {
               props.setSemaphoreId(undefined)
