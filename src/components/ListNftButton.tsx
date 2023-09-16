@@ -42,6 +42,7 @@ export function ListNFT({ nft, chain, identity, updateNftStatus, setSemaphoreId,
     functionName: 'approve',
     args: [anonExchangeAddr, BigInt(nft.tokenId)],
   })
+  const approveWait = useWaitForTransaction({ hash: approveWrite.data?.hash })
 
   const listNftWrite = useContractWrite({
     address: anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress] as Address,
@@ -69,8 +70,16 @@ export function ListNFT({ nft, chain, identity, updateNftStatus, setSemaphoreId,
   }, [anonExchangeAddr, approvedAddress, listNftWait.isSuccess, nft, setSemaphoreId, updateNftStatus, refreshSecret, isApprovedForAll])
 
   if (!approved) {
-    return <Button onClick={handleApprove}>Approve</Button>
+    return (
+      <Button onClick={handleApprove} isLoading={approveWait.isLoading}>
+        Approve
+      </Button>
+    )
   } else {
-    return <Button onClick={handleListNft}>List</Button>
+    return (
+      <Button onClick={handleListNft} isLoading={listNftWait.isLoading}>
+        List
+      </Button>
+    )
   }
 }

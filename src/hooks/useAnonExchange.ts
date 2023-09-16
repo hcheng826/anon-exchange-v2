@@ -3,6 +3,7 @@ import { anonExchangeAddress, anonExchangeABI } from 'abis'
 import { AnonExchangeContextType, EthDeposit, NftListing, NftStatus } from 'context/AnonExchangeContext'
 import { ethers } from 'ethers'
 import { chainInUse } from 'utils/config'
+import { sepolia } from 'wagmi'
 
 export default function useAnonExchange(): AnonExchangeContextType {
   const [nftListings, setNftListings] = useState<AnonExchangeContextType['nftListings']>([])
@@ -17,7 +18,7 @@ export default function useAnonExchange(): AnonExchangeContextType {
     const anonExchange = new ethers.Contract(
       anonExchangeAddress[chain?.id as keyof typeof anonExchangeAddress],
       anonExchangeABI,
-      new ethers.providers.JsonRpcProvider()
+      new ethers.providers.JsonRpcProvider(chain.rpcUrls.default.http[0])
     )
 
     type NftRecord = {
@@ -64,8 +65,9 @@ export default function useAnonExchange(): AnonExchangeContextType {
           }
         })
       })
-    )
-
+    ).catch((e) => {
+      console.error(e)
+    })
     const nftListings = []
 
     for (const contractAddress in nftLatestRecord) {
@@ -92,7 +94,9 @@ export default function useAnonExchange(): AnonExchangeContextType {
     const anonExchange = new ethers.Contract(
       anonExchangeAddress[chain?.id as keyof typeof anonExchangeAddress],
       anonExchangeABI,
-      new ethers.providers.JsonRpcProvider()
+      new ethers.providers.JsonRpcProvider(chain.id === sepolia.id ? chain.rpcUrls.infura.http[0] : chain.rpcUrls.default.http[0])
+      // new ethers.providers.JsonRpcProvider('https://sepolia.infura.io/v3/3c979d1c554c4d5ebd6148011a794e1d')
+      // new ethers.providers.JsonRpcProvider(chain.rpcUrls.default.http[0])
     )
     const ethDepositfilter = anonExchange.filters['EthDeposited']()
 

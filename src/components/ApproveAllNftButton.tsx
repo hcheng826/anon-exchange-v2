@@ -20,6 +20,7 @@ export function ApproveAllNFT({ chain }: { chain: Chain }) {
     abi: simpleNftABI,
     functionName: 'setApprovalForAll',
     args: [anonExchangeAddr, true],
+    chainId: chain.id,
   })
 
   const setApproveForAllWrite = useContractWrite(prepareSetApproveForAll.config)

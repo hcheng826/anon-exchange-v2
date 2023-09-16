@@ -16,6 +16,7 @@ export function DelistNFT({ nft, chain, updateNftStatus }: DelistNFTProps) {
     abi: anonExchangeABI,
     functionName: 'delistNFT',
     args: [nft.contractAddress as Address, BigInt(nft.tokenId)],
+    chainId: chain.id,
   })
 
   const delistNftWrite = useContractWrite(prepareDelistNFT.config)

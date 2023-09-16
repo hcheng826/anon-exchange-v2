@@ -27,7 +27,18 @@ export const SERVER_SESSION_SETTINGS = {
 export const NFT_SOLD_GROUP_ID = '1'
 export const ETH_DEPOSITED_GROUP_ID = '2'
 
-export const chainInUse = process.env.NEXT_PUBLIC_USE_LOCAL_NETWORK && process.env.NEXT_PUBLIC_USE_LOCAL_NETWORK === 'true' ? localhost : sepolia
+export const chainInUse =
+  process.env.NEXT_PUBLIC_USE_LOCAL_NETWORK && process.env.NEXT_PUBLIC_USE_LOCAL_NETWORK === 'true'
+    ? localhost
+    : {
+        ...sepolia,
+        rpcUrls: {
+          ...sepolia.rpcUrls,
+          default: {
+            http: ['https://sepolia.infura.io/v3/3c979d1c554c4d5ebd6148011a794e1d'],
+          },
+        },
+      }
 
 export const semaphoreStartBlock = {
   11155111: 4152108,

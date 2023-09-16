@@ -47,7 +47,6 @@ export default function ListNftPage() {
             simpleNftABI,
             new ethers.providers.JsonRpcProvider(chain?.rpcUrls.default.http[0])
           )
-
           return nftContract.ownerOf(updatedNft.tokenId).then((owner: Address) => {
             if (owner === address) {
               updatedNft.status = 'NotListed'
@@ -85,6 +84,7 @@ export default function ListNftPage() {
 
     return () => clearInterval(intervalId) // Cleanup interval when component unmounts
   }, [address, refreshNftListing, chain])
+
   function refreshSecret() {
     setSecret(uuidv4())
   }

@@ -36,6 +36,7 @@ export function DepositETH(props: DepositEthProps) {
     functionName: 'depositETH',
     value: nftPrice || BigInt(0),
     args: [semaphoreId.getCommitment()],
+    chainId: chain.id,
   })
 
   const contractWrite = useContractWrite(prepareContractWrite.config)
@@ -47,13 +48,6 @@ export function DepositETH(props: DepositEthProps) {
 
   useEffect(() => {
     if (waitForTransaction.isSuccess) {
-      // setDeposits((prevDeposits) => [
-      //   ...prevDeposits,
-      //   {
-      //     date: new Date(),
-      //     semaphoreId: semaphoreId.getCommitment().toString(),
-      //   },
-      // ])
       setSemaphoreId(undefined)
       refreshSecret()
     }
