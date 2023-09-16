@@ -78,7 +78,7 @@ export function ListNFT({ nft, chain, identity, updateNftStatus, setSemaphoreId,
           </>
         ),
       })
-      refreshSecret()
+      // refreshSecret()
     }
   }, [
     anonExchangeAddr,
@@ -87,7 +87,7 @@ export function ListNFT({ nft, chain, identity, updateNftStatus, setSemaphoreId,
     nft,
     setSemaphoreId,
     updateNftStatus,
-    refreshSecret,
+    // refreshSecret,
     isApprovedForAll,
     listNftWait.data?.transactionHash,
     toast,

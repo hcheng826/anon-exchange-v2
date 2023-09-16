@@ -74,8 +74,9 @@ export function SemaphoreIdentityGenerate(props: Props) {
         )}
       </Flex>
       <Text>
-        Note: The secret message is needed when you are claiming the ETH after the NFT is sold / Buying the NFT with a deposit. Carefully keep it
-        private and do not lose it.
+        Important Notice: The secret message is needed when you are claiming the ETH after the NFT is sold / Buying the NFT with a deposit.
+        <br /> 1. Keep it private and do not lose it
+        <br /> 2. Do not reuse it. Refresh the identity before making another listing/depoist.
       </Text>
     </div>
   )

@@ -1,22 +1,18 @@
-import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction, useNetwork, Address, Chain, useContractRead } from 'wagmi'
-import { Button, Heading, Text, Flex, Input, Table, Thead, Tr, Th, Tbody, Td, InputGroup, InputLeftAddon } from '@chakra-ui/react'
-import { NextSeo } from 'next-seo'
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, Chain, useContractRead } from 'wagmi'
+import { Button, Text } from '@chakra-ui/react'
+
 import { LinkComponent } from 'components/layout/LinkComponent'
-import { anonExchangeABI, anonExchangeAddress, simpleNftABI, simpleNftAddress } from 'abis'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { anonExchangeABI, anonExchangeAddress } from 'abis'
+import { Dispatch, SetStateAction, useEffect } from 'react'
 import { Identity } from '@semaphore-protocol/identity'
-import { ethers } from 'ethers'
-import { SemaphoreIdentityGenerate } from 'components/SemaphoreIdentityGenerate'
-import { HeadingComponent } from 'components/layout/HeadingComponent'
 
 export type Deposit = {
   date: Date
-  semaphoreId: string // replace with Semaphore Identity TypeemaphoreId
+  semaphoreId: string
 }
 
 interface DepositEthProps {
   chain: Chain
-  // setDeposits: Dispatch<SetStateAction<Deposit[]>>
   semaphoreId: Identity
   setSemaphoreId: Dispatch<SetStateAction<Identity | undefined>>
   refreshSecret: () => void
@@ -49,7 +45,7 @@ export function DepositETH(props: DepositEthProps) {
   useEffect(() => {
     if (waitForTransaction.isSuccess) {
       setSemaphoreId(undefined)
-      refreshSecret()
+      // refreshSecret()
     }
   }, [semaphoreId, waitForTransaction.isSuccess, setSemaphoreId, refreshSecret])
 

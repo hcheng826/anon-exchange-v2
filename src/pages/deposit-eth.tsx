@@ -52,7 +52,7 @@ export default function DepositEth() {
           </Button>
         )}
 
-        <Heading as="h2" fontSize="1xl" my={4}>
+        {/* <Heading as="h2" fontSize="1xl" my={4}>
           Deposit Records
         </Heading>
 
@@ -75,7 +75,7 @@ export default function DepositEth() {
                 </Tr>
               ))}
           </Tbody>
-        </Table>
+        </Table> */}
       </div>
     )
   }
