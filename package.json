@@ -27,6 +27,7 @@
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "@next/font": "13.1.1",
+    "@openzeppelin/defender-relay-client": "^1.48.0",
     "@semaphore-protocol/data": "^3.10.1",
     "@semaphore-protocol/group": "^3.10.1",
     "@semaphore-protocol/identity": "^3.10.1",
