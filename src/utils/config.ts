@@ -14,7 +14,7 @@ export const THEME_CONFIG = {
 export const SOCIAL_TWITTER = 'lilioo826'
 export const SOCIAL_GITHUB = 'hcheng826/anon-exchange'
 
-export const ETH_CHAINS = [mainnet, sepolia, localhost]
+export const ETH_CHAINS = [sepolia, localhost]
 
 export const SERVER_SESSION_SETTINGS = {
   cookieName: SITE_NAME,

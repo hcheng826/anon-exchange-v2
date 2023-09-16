@@ -94,9 +94,7 @@ export default function useAnonExchange(): AnonExchangeContextType {
     const anonExchange = new ethers.Contract(
       anonExchangeAddress[chain?.id as keyof typeof anonExchangeAddress],
       anonExchangeABI,
-      new ethers.providers.JsonRpcProvider(chain.id === sepolia.id ? chain.rpcUrls.infura.http[0] : chain.rpcUrls.default.http[0])
-      // new ethers.providers.JsonRpcProvider('https://sepolia.infura.io/v3/3c979d1c554c4d5ebd6148011a794e1d')
-      // new ethers.providers.JsonRpcProvider(chain.rpcUrls.default.http[0])
+      new ethers.providers.JsonRpcProvider(chain.rpcUrls.default.http[0])
     )
     const ethDepositfilter = anonExchange.filters['EthDeposited']()
 

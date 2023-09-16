@@ -1,5 +1,5 @@
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, Address, Chain, useContractRead, useAccount } from 'wagmi'
-import { Button } from '@chakra-ui/react'
+import { Button, useToast } from '@chakra-ui/react'
 import { anonExchangeABI, anonExchangeAddress, simpleNftABI, simpleNftAddress } from 'abis'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { NftListing, NftStatus } from 'context/AnonExchangeContext'
@@ -18,6 +18,8 @@ export function ListNFT({ nft, chain, identity, updateNftStatus, setSemaphoreId,
   const anonExchangeAddr = anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress]
   const [approved, setApproved] = useState<boolean>(false)
   const { address } = useAccount()
+
+  const toast = useToast()
 
   // check approval
   const { data: approvedAddress } = useContractRead({
@@ -65,9 +67,32 @@ export function ListNFT({ nft, chain, identity, updateNftStatus, setSemaphoreId,
     if (listNftWait.isSuccess) {
       updateNftStatus(nft, 'Listed')
       setSemaphoreId(undefined)
+      toast({
+        status: 'success',
+        description: (
+          <>
+            Success! Check on block explorer:
+            <a href={`${chain?.blockExplorers?.default.url}/tx/${listNftWait.data?.transactionHash}`} target="_blank" rel="noopener noreferrer">
+              {`${chain?.blockExplorers?.default.url}/tx/${listNftWait.data?.transactionHash}`}
+            </a>
+          </>
+        ),
+      })
       refreshSecret()
     }
-  }, [anonExchangeAddr, approvedAddress, listNftWait.isSuccess, nft, setSemaphoreId, updateNftStatus, refreshSecret, isApprovedForAll])
+  }, [
+    anonExchangeAddr,
+    approvedAddress,
+    listNftWait.isSuccess,
+    nft,
+    setSemaphoreId,
+    updateNftStatus,
+    refreshSecret,
+    isApprovedForAll,
+    listNftWait.data?.transactionHash,
+    toast,
+    chain?.blockExplorers?.default.url,
+  ])
 
   if (!approved) {
     return (

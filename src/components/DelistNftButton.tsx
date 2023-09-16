@@ -1,5 +1,5 @@
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, Address, Chain, useContractRead } from 'wagmi'
-import { Button } from '@chakra-ui/react'
+import { Button, useToast } from '@chakra-ui/react'
 import { anonExchangeABI, anonExchangeAddress } from 'abis'
 import { NftListing, NftStatus } from 'context/AnonExchangeContext'
 import { useEffect } from 'react'
@@ -11,6 +11,8 @@ interface DelistNFTProps {
 }
 
 export function DelistNFT({ nft, chain, updateNftStatus }: DelistNFTProps) {
+  const toast = useToast()
+
   const prepareDelistNFT = usePrepareContractWrite({
     address: anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress] as Address,
     abi: anonExchangeABI,
@@ -25,8 +27,19 @@ export function DelistNFT({ nft, chain, updateNftStatus }: DelistNFTProps) {
   useEffect(() => {
     if (delistNftWait.isSuccess) {
       updateNftStatus(nft, 'Delisted')
+      toast({
+        status: 'success',
+        description: (
+          <>
+            Success! Check on block explorer:
+            <a href={`${chain?.blockExplorers?.default.url}/tx/${delistNftWait.data?.transactionHash}`} target="_blank" rel="noopener noreferrer">
+              {`${chain?.blockExplorers?.default.url}/tx/${delistNftWait.data?.transactionHash}`}
+            </a>
+          </>
+        ),
+      })
     }
-  }, [delistNftWait.isSuccess, nft, updateNftStatus])
+  }, [chain?.blockExplorers?.default.url, delistNftWait.data?.transactionHash, delistNftWait.isSuccess, nft, toast, updateNftStatus])
 
   const handleDelistNft = () => {
     delistNftWrite.write?.()
