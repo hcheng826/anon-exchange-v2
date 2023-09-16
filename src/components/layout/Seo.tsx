@@ -19,7 +19,7 @@ export function Seo() {
         url: origin,
         images: [
           {
-            url: `${origin}/og.png`,
+            url: `${origin}/sempahore.png`,
             alt: `${SITE_NAME} Open Graph Image`,
           },
         ],
