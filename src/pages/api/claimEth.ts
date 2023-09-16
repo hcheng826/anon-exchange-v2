@@ -6,8 +6,8 @@ import { localhost } from 'viem/chains'
 import { sepolia } from 'wagmi'
 import { chainInUse } from 'utils/config'
 
-export default async function buyNft(req: NextApiRequest, res: NextApiResponse) {
-  const { nft, fullProof, recipient } = req.body
+export default async function claimEth(req: NextApiRequest, res: NextApiResponse) {
+  const { fullProof, recipient } = req.body
 
   // Approach 1: OpenZeppelin relayer (tx often stuck: https://forum.openzeppelin.com/t/ethereum-goerli-testnet-relayer-stuck/36929)
 
@@ -48,23 +48,9 @@ export default async function buyNft(req: NextApiRequest, res: NextApiResponse) 
   const anonExchange = new ethers.Contract(anonExchangeAddr, anonExchangeABI, relayer)
 
   try {
-    await anonExchange.callStatic.buyAndClaimNFT(
-      nft.contractAddress,
-      nft.tokenId,
-      fullProof.merkleTreeRoot,
-      fullProof.nullifierHash,
-      fullProof.proof,
-      recipient
-    )
+    await anonExchange.callStatic.claimETH(recipient, fullProof.merkleTreeRoot, fullProof.nullifierHash, fullProof.proof)
 
-    const tx = await anonExchange.buyAndClaimNFT(
-      nft.contractAddress,
-      nft.tokenId,
-      fullProof.merkleTreeRoot,
-      fullProof.nullifierHash,
-      fullProof.proof,
-      recipient
-    )
+    const tx = await anonExchange.claimETH(recipient, fullProof.merkleTreeRoot, fullProof.nullifierHash, fullProof.proof)
     const rc = await tx.wait()
     res.status(200).json({ tx_hash: rc.transactionHash })
     return
@@ -72,9 +58,7 @@ export default async function buyNft(req: NextApiRequest, res: NextApiResponse) 
     const err = decodeError(e)
 
     let errorMsg = ''
-    if (err.error === 'ERC721: transfer to non ERC721Receiver implementer') {
-      errorMsg = 'Invalid recipient address (non ERC721Receiver implementer)'
-    } else if (err.error === '0x948d0674') {
+    if (err.error === '0x948d0674') {
       errorMsg = 'Semaphore Id has been used'
     } else {
       errorMsg = 'Unknown error'
