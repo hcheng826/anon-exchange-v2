@@ -1,5 +1,5 @@
-import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction, useNetwork, Address, Chain } from 'wagmi'
-import { Button, Heading, Text, Flex, Input, Table, Thead, Tr, Th, Tbody, Td, InputGroup, InputLeftAddon } from '@chakra-ui/react'
+import { useAccount, useNetwork, sepolia } from 'wagmi'
+import { Button, Heading } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
 import { Identity } from '@semaphore-protocol/identity'
@@ -8,6 +8,7 @@ import { HeadingComponent } from 'components/layout/HeadingComponent'
 import { DepositETH } from 'components/DepositEthButton'
 import { v4 as uuidv4 } from 'uuid'
 import useAnonExchange from 'hooks/useAnonExchange'
+import { localhost } from 'viem/chains'
 
 export default function DepositEth() {
   const { address, isConnected } = useAccount()
@@ -25,7 +26,7 @@ export default function DepositEth() {
     setSecret(uuidv4())
   }
 
-  if (isConnected && address && chain) {
+  if (isConnected && address && (chain?.id === sepolia.id || chain?.id === localhost.id)) {
     return (
       <div>
         <NextSeo title="Deposit ETH" />
@@ -80,5 +81,5 @@ export default function DepositEth() {
     )
   }
 
-  return <div>Connect your wallet first to deposit ETH.</div>
+  return <div>Connect your wallet to Sepolia</div>
 }

@@ -1,4 +1,4 @@
-import { Address, useAccount, useNetwork } from 'wagmi'
+import { Address, sepolia, useAccount, useNetwork } from 'wagmi'
 import { Button, Heading, list } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
@@ -17,6 +17,7 @@ import useAnonExchange from 'hooks/useAnonExchange'
 import { ListNftSold } from 'components/ListNftSoldButton'
 import { ethers } from 'ethers'
 import { simpleNftABI } from 'abis'
+import { localhost } from 'viem/chains'
 
 export default function ListNftPage() {
   const { address, isConnected } = useAccount()
@@ -100,7 +101,7 @@ export default function ListNftPage() {
     )
   }
 
-  if (isConnected && address && chain) {
+  if (isConnected && address && (chain?.id === sepolia.id || chain?.id === localhost.id)) {
     return (
       <div>
         <NextSeo title="Mint NFT" />
@@ -173,5 +174,5 @@ export default function ListNftPage() {
     )
   }
 
-  return <div>Connect your wallet first to mint test NFT.</div>
+  return <div>Connect your wallet to Sepolia</div>
 }
