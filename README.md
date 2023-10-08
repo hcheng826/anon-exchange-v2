@@ -68,6 +68,8 @@ Note that transaction for buying NFT and claiming ETH can be sent from any addre
 
 ## Development 🛠️
 
+Populate the environment variables in `.env` according to `.env.example`
+
 ### Smart Contracts
 
 Go to `contracts/`
@@ -99,3 +101,27 @@ Go to `contracts/`
   ```
 
 ### Frontend
+
+The project uses Next.js framework and Vercel for deployment
+
+To config the contract addresses
+
+1. Fill in the addresses in `wagmi.config.ts`
+2. Run `yarn wagmi` to genereate the file `abis.ts`
+
+- Start Local
+
+  ```bash
+  yarn start
+  ```
+
+- Local watch mode
+
+  ```bash
+  yarn dev
+  ```
+
+- Build
+  ```bash
+  yarn build
+  ```
