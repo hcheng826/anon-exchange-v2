@@ -1,10 +1,11 @@
 import React from 'react'
-import { Flex, useColorModeValue, Spacer, Heading } from '@chakra-ui/react'
+import { Flex, useColorModeValue, Spacer, Heading, Button } from '@chakra-ui/react'
 import { SITE_NAME } from 'utils/config'
 import { LinkComponent } from './LinkComponent'
 import { ThemeSwitcher } from './ThemeSwitcher'
 import { PassportScore } from './PassportScore'
 import { Web3Button } from '@web3modal/react'
+import { useWeb3Auth } from 'providers/SafeWeb3AuthProvider'
 
 interface Props {
   className?: string
@@ -12,6 +13,7 @@ interface Props {
 
 export function Header(props: Props) {
   const className = props.className ?? ''
+  const { isInitialized, isConnected, handleSignIn } = useWeb3Auth()
 
   return (
     <Flex as="header" className={className} bg={useColorModeValue('gray.100', 'gray.900')} px={4} py={2} mb={8} alignItems="center">
@@ -57,7 +59,20 @@ export function Header(props: Props) {
 
       <Flex alignItems="center" gap={4}>
         <PassportScore />
-        <Web3Button icon="hide" label="Connect" />
+        {isInitialized ? (
+          isConnected ? (
+            <Button>Connected</Button>
+          ) : (
+            <Button label="ConnectSafe" onClick={handleSignIn}>
+              connect safe
+            </Button>
+          )
+        ) : (
+          <Button isLoading>Initializing...</Button>
+        )}
+      </Flex>
+
+      <Flex alignItems="center" gap={4}>
         <ThemeSwitcher />
       </Flex>
     </Flex>
