@@ -20,11 +20,6 @@ contract AnonExchange is IERC721Receiver, IERC1155Receiver {
 
   uint256 public constant LISTING_PRICE = 0.01 ether;
 
-  struct ListNFTRecord {
-    address sellerAddr;
-    uint256 idCommitment;
-  }
-
   enum ListingType {
     ERC20,
     ERC721,
@@ -148,7 +143,7 @@ contract AnonExchange is IERC721Receiver, IERC1155Receiver {
     emit EthWithdrawn(ethRecipient);
   }
 
-  // Can be called by any address with proof after NFT is sold
+  // Can be called by any address with proof after Listing is sold
   function claimETH(address ethRecipient, SemaphoreProof calldata proof) external {
     semaphore.verifyProof(
       LISTING_SOLD_SELLER_GROUP_ID,

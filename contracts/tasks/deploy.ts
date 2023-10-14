@@ -20,11 +20,19 @@ task('deploy', 'Deploy Semaphore, AnonExchange and SimpleNFT')
 
     await anonExchange.deployed()
 
-    const SimpleNFTFactory = await ethers.getContractFactory('SimpleNFT')
-    const SimpleNFT = await SimpleNFTFactory.deploy()
+    const Simple20Factory = await ethers.getContractFactory('Simple20')
+    const Simple20 = await Simple20Factory.deploy()
+
+    const Simple721Factory = await ethers.getContractFactory('Simple721')
+    const Simple721 = await Simple721Factory.deploy()
+
+    const Simple1155Factory = await ethers.getContractFactory('Simple1155')
+    const Simple1155 = await Simple1155Factory.deploy()
 
     if (logs) {
-      console.info(`SimpleNFT contract addr: ${SimpleNFT.address}`)
+      console.info(`Simple20 contract addr: ${Simple20.address}`)
+      console.info(`Simple721 contract addr: ${Simple721.address}`)
+      console.info(`Simple1155 contract addr: ${Simple1155.address}`)
       console.info(`AnonExchange contract has been deployed to: ${anonExchange.address}`)
     }
 
