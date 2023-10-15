@@ -24,9 +24,9 @@ export function Header(props: Props) {
       <Spacer />
 
       <Flex alignItems="center" px={4}>
-        <LinkComponent href="/list-nft">
+        <LinkComponent href="/list-asset">
           <Heading as="h1" size="ms">
-            List NFT
+            List Asset
           </Heading>
         </LinkComponent>
       </Flex>

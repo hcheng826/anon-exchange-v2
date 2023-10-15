@@ -1,13 +1,13 @@
-import { Address, sepolia, useAccount, useNetwork } from 'wagmi'
-import { Button, Heading, list } from '@chakra-ui/react'
+import { Address, useAccount, useNetwork } from 'wagmi'
+import { Box, Button, Flex, Heading } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
 import { NftList } from 'components/NftList'
 import { SemaphoreIdentityGenerate } from 'components/SemaphoreIdentityGenerate'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
-import { NftListing, NftStatus } from 'context/AnonExchangeContext'
+import { Listing, NftListing, NftStatus } from 'context/AnonExchangeContext'
 import { Identity } from '@semaphore-protocol/identity'
-import { MintNFT } from 'components/MintNftButton'
+import { MintErc721 } from 'components/MintErc721'
 import { ImportNft } from 'components/ImportNftButton'
 import { ListNFT } from 'components/ListNftButton'
 import { DelistNFT } from 'components/DelistNftButton'
@@ -17,10 +17,11 @@ import useAnonExchange from 'hooks/useAnonExchange'
 import { ListNftSold } from 'components/ListNftSoldButton'
 import { ethers } from 'ethers'
 import { simpleNftABI } from 'abis'
-import { localhost } from 'viem/chains'
 import { supportedChains } from 'utils/config'
+import { MintErc20 } from 'components/MintErc20'
+import { MintErc1155 } from 'components/MintErc1155'
 
-export default function ListNftPage() {
+export default function ListPage() {
   const { address, isConnected } = useAccount()
   const { chain } = useNetwork()
 
@@ -31,6 +32,7 @@ export default function ListNftPage() {
   const { refreshNftListing } = useAnonExchange()
 
   const [nfts, setNfts] = useState<NftListing[]>([])
+  const [listings, setListings] = useState<Listing[]>([])
 
   useEffect(() => {
     const fetchAndSetListings = async () => {
@@ -105,20 +107,29 @@ export default function ListNftPage() {
   if (isConnected && address && chain && supportedChains.map((chain) => chain.id as number).includes(chain.id)) {
     return (
       <div>
-        <NextSeo title="Mint NFT" />
+        <NextSeo title="List Asset" />
 
-        <HeadingComponent as="h2">List NFT</HeadingComponent>
+        <HeadingComponent as="h2">List Asset</HeadingComponent>
 
         <Heading as="h2" fontSize="2xl" my={4}>
-          Mint Test NFT
+          Mint Test Asset
         </Heading>
-        <MintNFT address={address} chain={chain} setNfts={setNfts} />
-        <ApproveAllNFT chain={chain} />
+        <Flex gap={4} alignItems={'stretch'} w="100%">
+          <Box flex="1" px="2">
+            <MintErc20 address={address} chain={chain} setListings={setListings} />
+          </Box>
+          <Box flex="1" px="2">
+            <MintErc721 address={address} chain={chain} setListings={setListings} />
+          </Box>
+          <Box flex="1" px="2">
+            <MintErc1155 address={address} chain={chain} setListings={setListings} />
+          </Box>
+        </Flex>
 
         <SemaphoreIdentityGenerate semaphoreId={semaphoreId} setSemaphoreId={setSemaphoreId} secret={secret} refreshSecret={refreshSecret} />
 
         <Heading as="h2" fontSize="2xl" my={4}>
-          NFT List
+          Asset List
         </Heading>
 
         <ImportNft

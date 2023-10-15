@@ -29,7 +29,18 @@ const config: HardhatUserConfig = {
       mainnet: etherscanApiKey,
       sepolia: etherscanApiKey,
       polygonMumbai: polygonApiKey,
+      mantleTest: etherscanApiKey,
     },
+    customChains: [
+      {
+        network: 'mantleTest',
+        chainId: 5001,
+        urls: {
+          apiURL: 'https://explorer.testnet.mantle.xyz/api',
+          browserURL: 'https://explorer.testnet.mantle.xyz',
+        },
+      },
+    ],
   },
   networks: {
     hardhat: {

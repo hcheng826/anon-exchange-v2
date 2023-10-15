@@ -1,22 +1,22 @@
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, Address, Chain, useContractRead } from 'wagmi'
 import { Alert, AlertDescription, AlertIcon, AlertTitle, Button, Link, Text, Toast, useToast } from '@chakra-ui/react'
-import { LinkComponent } from 'components/layout/LinkComponent'
-import { simpleNftABI, simpleNftAddress } from 'abis'
+import { simpleNftABI, simple721Address } from 'abis'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { NftListing } from 'context/AnonExchangeContext'
+import { Listing } from 'context/AnonExchangeContext'
+import { ApproveAllNFT } from './ApproveAllNftButton'
 
-export function MintNFT({ address, chain, setNfts }: { address: Address; chain: Chain; setNfts: Dispatch<SetStateAction<NftListing[]>> }) {
+export function MintErc721({ address, chain, setListings }: { address: Address; chain: Chain; setListings: Dispatch<SetStateAction<Listing[]>> }) {
   const toast = useToast()
 
   const { refetch: tokenIdRefetch } = useContractRead({
-    address: simpleNftAddress[chain?.id as keyof typeof simpleNftAddress],
+    address: simple721Address[chain?.id as keyof typeof simple721Address],
     abi: simpleNftABI,
     functionName: '_tokenIdCounter',
     watch: true,
   })
 
   const prepareSafeMintWrite = usePrepareContractWrite({
-    address: simpleNftAddress[chain.id as keyof typeof simpleNftAddress],
+    address: simple721Address[chain.id as keyof typeof simple721Address],
     abi: simpleNftABI,
     functionName: 'safeMint',
     args: [address],
@@ -33,21 +33,26 @@ export function MintNFT({ address, chain, setNfts }: { address: Address; chain: 
     if (waitForTransaction.isSuccess) {
       toast({ description: 'Successfully Minted NFT!' })
       tokenIdRefetch().then(({ data: tokenId }) => {
-        setNfts((prevNfts) => [
-          ...prevNfts,
+        setListings((prevListings) => [
+          ...prevListings,
           {
-            contractAddress: simpleNftAddress[chain.id as keyof typeof simpleNftAddress],
+            listingType: 'ERC721',
+            lister: address,
+            amount: 1,
+            contractAddress: simple721Address[chain.id as keyof typeof simple721Address],
             tokenId: Number(tokenId) - 1,
             status: 'NotListed',
           },
         ])
       })
     }
-  }, [chain.id, setNfts, toast, tokenIdRefetch, waitForTransaction.isSuccess])
+  }, [address, chain.id, setListings, toast, tokenIdRefetch, waitForTransaction.isSuccess])
+
+  console.log('safeMintWrite', safeMintWrite)
 
   return (
     <div>
-      {!safeMintWrite.write && <p>Please connect to Sepolia testnet</p>}
+      {!safeMintWrite.write && <p>Please connect to supported network</p>}
       <Button
         width="full"
         disabled={waitForTransaction.isLoading || safeMintWrite.isLoading || !safeMintWrite.write}
@@ -78,6 +83,7 @@ export function MintNFT({ address, chain, setNfts }: { address: Address; chain: 
           </AlertDescription>
         </Alert>
       )}
+      <ApproveAllNFT chain={chain} />
     </div>
   )
 }

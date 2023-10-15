@@ -8,10 +8,21 @@ export enum Signal {
   SELLER_CLAIM_ETH = 2,
 }
 
+export type ListingType = 'ERC20' | 'ERC721' | 'ERC1155'
+
 export type NftListing = {
   lister?: string
   contractAddress: string
   tokenId: number
+  status: NftStatus
+}
+
+export type Listing = {
+  listingType: ListingType
+  lister?: string
+  contractAddress: string
+  amount: number
+  tokenId?: number
   status: NftStatus
 }
 

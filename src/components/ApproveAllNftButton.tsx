@@ -34,7 +34,7 @@ export function ApproveAllNFT({ chain }: { chain: Chain }) {
     <></>
   ) : (
     <div>
-      {!setApproveForAllWrite.write && <p>Please connect to Sepolia testnet</p>}
+      {!setApproveForAllWrite.write}
       <Button
         width="full"
         disabled={waitForTransaction.isLoading || setApproveForAllWrite.isLoading || !setApproveForAllWrite.write}

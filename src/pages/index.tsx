@@ -10,10 +10,10 @@ import WithdrawIcon from 'assets/icons/withdraw.png'
 
 export const OperationItems = [
   {
-    title: 'List NFT',
-    description: 'NFT sellers can import their own NFT or mint test NFT to list it on the exchange',
+    title: 'List Asset',
+    description: 'Sellers can mint test asset for import their own asset or to list it on the exchange',
     image: NFTIcon.src,
-    url: '/list-nft',
+    url: '/list-asset',
   },
   {
     title: 'Deposit ETH',
@@ -22,15 +22,15 @@ export const OperationItems = [
     url: '/deposit-eth',
   },
   {
-    title: 'Buy NFT',
-    description: 'With the secret associated with a valid ETH deposit, buyer can buy NFT and receive it at a desired address',
+    title: 'Buy Asset',
+    description: 'With the secret associated with a valid ETH deposit, buyer can buy Asset and receive it at a desired address',
     image: CartIcon.src,
-    url: '/buy-nft',
+    url: '/buy-asset',
   },
   {
-    title: 'NFT Seller Claim ETH',
+    title: 'Seller Claim ETH',
     description:
-      'With the secret associated with a valid NFT listing and after the NFT is sold. Seller can claim the ETH and receive it at a desired address',
+      'With the secret associated with a valid asset listing and after the asset is sold. Seller can claim the ETH and receive it at a desired address',
     image: WithdrawIcon.src,
     url: '/claim-eth',
   },

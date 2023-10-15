@@ -68,15 +68,15 @@ export function SemaphoreIdentityGenerate(props: Props) {
         {props.semaphoreId !== undefined && (
           <Alert status="success">
             <AlertIcon />
-            Semaphore Identity created successfully with secret: <br /> {secret} <br /> Note it down before you list NFT or deposit ETH, it will
-            refresh and will NOT appear again
+            Semaphore Identity created successfully with secret: <br /> {secret} <br /> Note the secret down before you list other assets or deposit
+            ETH, it will refresh and will NOT appear again
           </Alert>
         )}
       </Flex>
       <Text>
-        Important Notice: The secret message is needed when you are claiming the ETH after the NFT is sold / Buying the NFT with a deposit.
+        Important Notice: The secret message is needed when you are claiming the ETH after the asset is sold / Buying the asset with a deposit.
         <br /> 1. Keep it private and do not lose it
-        <br /> 2. Do not reuse it. Refresh the identity before making another listing/depoist.
+        <br /> 2. Do not reuse it. Refresh the identity before making another listing/deposit.
       </Text>
     </div>
   )
