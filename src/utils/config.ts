@@ -1,5 +1,5 @@
 import { ThemingProps } from '@chakra-ui/react'
-import { mainnet, sepolia, polygon, optimism, arbitrum, localhost } from '@wagmi/chains'
+import { localhost, sepolia, mantleTestnet, polygonZkEvmTestnet, scrollSepolia } from '@wagmi/chains'
 
 export const SITE_NAME = 'Anon Exchange'
 export const SITE_DESCRIPTION = 'anonymous exhcange based on Semaphore protocol'
@@ -12,9 +12,9 @@ export const THEME_CONFIG = {
 }
 
 export const SOCIAL_TWITTER = 'lilioo826'
-export const SOCIAL_GITHUB = 'hcheng826/anon-exchange'
+export const SOCIAL_GITHUB = 'hcheng826/anon-exchange-v2'
 
-export const ETH_CHAINS = [sepolia, localhost]
+export const supportedChains = [localhost, sepolia, mantleTestnet, polygonZkEvmTestnet, scrollSepolia]
 
 export const SERVER_SESSION_SETTINGS = {
   cookieName: SITE_NAME,
@@ -43,4 +43,5 @@ export const chainInUse =
 export const semaphoreStartBlock = {
   11155111: 4152108,
   1337: 0,
+  5001: 23750086,
 }

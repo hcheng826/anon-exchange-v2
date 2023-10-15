@@ -9,6 +9,7 @@ import { DepositETH } from 'components/DepositEthButton'
 import { v4 as uuidv4 } from 'uuid'
 import useAnonExchange from 'hooks/useAnonExchange'
 import { localhost } from 'viem/chains'
+import { supportedChains } from 'utils/config'
 
 export default function DepositEth() {
   const { address, isConnected } = useAccount()
@@ -26,7 +27,7 @@ export default function DepositEth() {
     setSecret(uuidv4())
   }
 
-  if (isConnected && address && (chain?.id === sepolia.id || chain?.id === localhost.id)) {
+  if (isConnected && address && chain && supportedChains.map((chain) => chain.id as number).includes(chain.id)) {
     return (
       <div>
         <NextSeo title="Deposit ETH" />
@@ -81,5 +82,5 @@ export default function DepositEth() {
     )
   }
 
-  return <div>Connect your wallet to Sepolia</div>
+  return <div>Connect your wallet to supported chains: {supportedChains.map((chain) => chain.name).join(', ')}.</div>
 }

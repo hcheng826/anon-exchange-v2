@@ -1,7 +1,7 @@
 import { EthereumClient, w3mConnectors, w3mProvider } from '@web3modal/ethereum'
 import { configureChains, createConfig, WagmiConfig } from 'wagmi'
 import { publicProvider } from 'wagmi/providers/public'
-import { ETH_CHAINS, THEME_COLOR_SCHEME } from 'utils/config'
+import { supportedChains, THEME_COLOR_SCHEME } from 'utils/config'
 import { useColorMode } from '@chakra-ui/react'
 import { ReactNode, useEffect, useState } from 'react'
 import { Web3Modal } from '@web3modal/react'
@@ -14,7 +14,7 @@ const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? ''
 if (!projectId) {
   console.warn('You need to provide a NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID env variable')
 }
-const { chains, publicClient, webSocketPublicClient } = configureChains(ETH_CHAINS, [publicProvider(), w3mProvider({ projectId: projectId })])
+const { chains, publicClient, webSocketPublicClient } = configureChains(supportedChains, [publicProvider(), w3mProvider({ projectId: projectId })])
 
 const wagmiConfig = createConfig({
   autoConnect: true,

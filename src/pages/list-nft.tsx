@@ -18,6 +18,7 @@ import { ListNftSold } from 'components/ListNftSoldButton'
 import { ethers } from 'ethers'
 import { simpleNftABI } from 'abis'
 import { localhost } from 'viem/chains'
+import { supportedChains } from 'utils/config'
 
 export default function ListNftPage() {
   const { address, isConnected } = useAccount()
@@ -101,7 +102,7 @@ export default function ListNftPage() {
     )
   }
 
-  if (isConnected && address && (chain?.id === sepolia.id || chain?.id === localhost.id)) {
+  if (isConnected && address && chain && supportedChains.map((chain) => chain.id as number).includes(chain.id)) {
     return (
       <div>
         <NextSeo title="Mint NFT" />
@@ -174,5 +175,5 @@ export default function ListNftPage() {
     )
   }
 
-  return <div>Connect your wallet to Sepolia</div>
+  return <div>Connect your wallet to supported chains: {supportedChains.map((chain) => chain.name).join(', ')}.</div>
 }
