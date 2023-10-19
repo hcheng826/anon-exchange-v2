@@ -1,6 +1,6 @@
 import React from 'react'
 
-export type NftStatus = 'NotListed' | 'Listed' | 'Delisted' | 'Sold'
+export type ListingStatus = 'NotListed' | 'Listed' | 'Delisted' | 'Sold'
 
 export enum Signal {
   BUYER_WITHDRAW_UNSPENT_ETH = 0,
@@ -8,13 +8,10 @@ export enum Signal {
   SELLER_CLAIM_ETH = 2,
 }
 
-export type ListingType = 'ERC20' | 'ERC721' | 'ERC1155'
-
-export type NftListing = {
-  lister?: string
-  contractAddress: string
-  tokenId: number
-  status: NftStatus
+export enum ListingType {
+  ERC20,
+  ERC721,
+  ERC1155,
 }
 
 export type Listing = {
@@ -23,7 +20,8 @@ export type Listing = {
   contractAddress: string
   amount: number
   tokenId?: number
-  status: NftStatus
+  status: ListingStatus
+  listingIdx?: number
 }
 
 export type EthDeposit = {
@@ -32,16 +30,16 @@ export type EthDeposit = {
 }
 
 export type AnonExchangeContextType = {
-  nftListings: NftListing[]
+  listings: Listing[]
   ethDeposits: EthDeposit[]
-  refreshNftListing: () => Promise<NftListing[]>
+  refreshListing: () => Promise<Listing[]>
   refreshEthDeposits: () => Promise<void>
 }
 
 export default React.createContext<AnonExchangeContextType>({
-  nftListings: [],
+  listings: [],
   ethDeposits: [],
-  refreshNftListing: async () => {
+  refreshListing: async () => {
     return []
   },
   refreshEthDeposits: async () => {},

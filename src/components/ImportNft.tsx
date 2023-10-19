@@ -1,6 +1,6 @@
-import { Button, Heading, Flex, Input, InputGroup, InputLeftAddon, useToast } from '@chakra-ui/react'
-import { simpleNftABI } from 'abis'
-import { NftListing } from 'context/AnonExchangeContext'
+import { Button, Heading, Flex, Input, InputGroup, InputLeftAddon, useToast, Stack } from '@chakra-ui/react'
+import { simple721ABI } from 'abis'
+import { Listing, ListingType } from 'context/AnonExchangeContext'
 import { Dispatch, SetStateAction } from 'react'
 import { Address, isAddress } from 'viem'
 import { useContractRead } from 'wagmi'
@@ -10,21 +10,21 @@ export function ImportNft({
   setContractAddressInput,
   tokenIdInput,
   setTokenIdInput,
-  nfts,
-  setNfts,
+  listings,
+  setListings,
   address,
 }: {
   contractAddressInput: string
   setContractAddressInput: Dispatch<SetStateAction<string>>
   tokenIdInput: number | null
   setTokenIdInput: Dispatch<SetStateAction<number | null>>
-  nfts: NftListing[]
-  setNfts: Dispatch<SetStateAction<NftListing[]>>
+  listings: Listing[]
+  setListings: Dispatch<SetStateAction<Listing[]>>
   address: `0x${string}` | undefined
 }) {
   const { data: ownerOfImportNft } = useContractRead({
     address: contractAddressInput as Address,
-    abi: simpleNftABI,
+    abi: simple721ABI,
     functionName: 'ownerOf',
     args: [BigInt(tokenIdInput || 0)],
     watch: true,
@@ -49,14 +49,15 @@ export function ImportNft({
     }
 
     if (
-      nfts
-        .map((nft) => {
-          return nft.contractAddress
+      listings
+        .filter((listing) => listing.listingType === ListingType.ERC721)
+        .map((listing) => {
+          return listing.contractAddress
         })
         .includes(contractAddressInput) &&
-      nfts
-        .map((nft) => {
-          return nft.tokenId
+      listings
+        .map((listing) => {
+          return listing.tokenId
         })
         .includes(tokenIdInput)
     ) {
@@ -68,9 +69,11 @@ export function ImportNft({
     }
 
     if (ownerOfImportNft === address) {
-      setNfts((prevNfts) => [
-        ...prevNfts,
+      setListings((prevListings) => [
+        ...prevListings,
         {
+          listingType: ListingType.ERC721,
+          amount: 1,
           contractAddress: contractAddressInput,
           tokenId: tokenIdInput,
           status: 'NotListed', // default action
@@ -89,23 +92,22 @@ export function ImportNft({
   return (
     <div>
       <Heading as="h2" fontSize="1xl" my={4}>
-        Import your own NFT
+        NFT
       </Heading>
 
-      <Flex mb={4} align="center">
-        <InputGroup size="md" mr={2}>
-          <InputLeftAddon>NFT Address</InputLeftAddon>
-          <Input placeholder="0x12345...6789" value={contractAddressInput} onChange={(e) => setContractAddressInput(e.target.value)} />
+      <Stack spacing={4} mb={4} align="center">
+        <InputGroup size="md">
+          <Input placeholder="contract addr: 0x12345...6789" value={contractAddressInput} onChange={(e) => setContractAddressInput(e.target.value)} />
         </InputGroup>
 
-        <InputGroup size="md" mr={2}>
-          <InputLeftAddon>Token ID</InputLeftAddon>
+        <InputGroup size="md">
           <Input placeholder="Enter Token ID" type="number" value={tokenIdInput ?? ''} onChange={(e) => setTokenIdInput(Number(e.target.value))} />
         </InputGroup>
 
-        {/* TODO: validate the input format and user owns the NFT */}
-        <Button onClick={handleImport}>Import</Button>
-      </Flex>
+        <Button onClick={handleImport} w={'100%'}>
+          Import
+        </Button>
+      </Stack>
     </div>
   )
 }

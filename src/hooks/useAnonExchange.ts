@@ -1,16 +1,16 @@
 import { useCallback, useState } from 'react'
 import { anonExchangeAddress, anonExchangeABI } from 'abis'
-import { AnonExchangeContextType, EthDeposit, NftListing, NftStatus } from 'context/AnonExchangeContext'
+import { AnonExchangeContextType, EthDeposit, Listing, ListingStatus } from 'context/AnonExchangeContext'
 import { ethers } from 'ethers'
 import { chainInUse } from 'utils/config'
 import { sepolia } from 'wagmi'
 
 export default function useAnonExchange(): AnonExchangeContextType {
-  const [nftListings, setNftListings] = useState<AnonExchangeContextType['nftListings']>([])
+  const [listings, setListings] = useState<AnonExchangeContextType['listings']>([])
   const [ethDeposits, setEthDeposits] = useState<AnonExchangeContextType['ethDeposits']>([])
   const chain = chainInUse
 
-  const refreshNftListing = useCallback(async (): Promise<NftListing[]> => {
+  const refreshListing = useCallback(async (): Promise<Listing[]> => {
     if (!chain || !anonExchangeAddress[chain?.id as keyof typeof anonExchangeAddress]) {
       return []
     }
@@ -21,43 +21,47 @@ export default function useAnonExchange(): AnonExchangeContextType {
       new ethers.providers.JsonRpcProvider(chain.rpcUrls.default.http[0])
     )
 
-    type NftRecord = {
+    type ListingRecord = {
       blockNumber: number
-      lister: string
-      status: NftStatus
+      listing: Listing
+      status: ListingStatus
     }
 
-    const nftLatestRecord: Record<string, Record<number, NftRecord>> = {}
+    const listingLatestRecord: Record<string, Record<number, ListingRecord>> = {}
 
-    const nftListedfilter = anonExchange.filters['NftListed']()
-    const nftDelistedfilter = anonExchange.filters['NftDelisted']()
-    const nftSoldfilter = anonExchange.filters['NftSold']()
+    const listingListedfilter = anonExchange.filters.Listed()
+    const listingDelistedfilter = anonExchange.filters.Delisted()
+    const listingSoldfilter = anonExchange.filters.Sold()
 
-    const filters = [nftListedfilter, nftDelistedfilter, nftSoldfilter]
-    const statuses: NftStatus[] = ['Listed', 'Delisted', 'Sold']
+    const filters = [listingListedfilter, listingDelistedfilter, listingSoldfilter]
+    const statuses: ListingStatus[] = ['Listed', 'Delisted', 'Sold']
 
     await Promise.all(
       filters.map(async (filter, i) => {
         const events = await anonExchange.queryFilter(filter)
         events.map((event) => {
           if (event.args) {
-            const { lister, nftAddr, tokenId } = event.args
+            const listing = event.args.listing
+            listing.listingIdx = event.args.listingIdx
 
-            if (!nftLatestRecord[nftAddr]) {
-              nftLatestRecord[nftAddr] = {}
+            const listingAddr = listing.contractAddress
+            const tokenId = listing.tokenId
+
+            if (!listingLatestRecord[listingAddr]) {
+              listingLatestRecord[listingAddr] = {}
             }
 
-            if (!nftLatestRecord[nftAddr][tokenId]) {
-              nftLatestRecord[nftAddr][tokenId] = {
+            if (!listingLatestRecord[listingAddr][tokenId]) {
+              listingLatestRecord[listingAddr][tokenId] = {
                 blockNumber: event.blockNumber,
-                lister,
+                listing: listing,
                 status: statuses[i],
               }
             } else {
-              if (event.blockNumber > nftLatestRecord[nftAddr][tokenId].blockNumber) {
-                nftLatestRecord[nftAddr][tokenId] = {
+              if (event.blockNumber > listingLatestRecord[listingAddr][tokenId].blockNumber) {
+                listingLatestRecord[listingAddr][tokenId] = {
                   blockNumber: event.blockNumber,
-                  lister,
+                  listing: listing,
                   status: statuses[i],
                 }
               }
@@ -68,22 +72,21 @@ export default function useAnonExchange(): AnonExchangeContextType {
     ).catch((e) => {
       console.error(e)
     })
-    const nftListings = []
 
-    for (const contractAddress in nftLatestRecord) {
-      for (const tokenIdStr in nftLatestRecord[contractAddress]) {
-        const record = nftLatestRecord[contractAddress][tokenIdStr]
-        nftListings.push({
-          lister: record.lister,
-          contractAddress: contractAddress,
-          tokenId: parseInt(tokenIdStr),
+    const listings: Listing[] = []
+
+    for (const contractAddress in listingLatestRecord) {
+      for (const tokenIdStr in listingLatestRecord[contractAddress]) {
+        const record = listingLatestRecord[contractAddress][tokenIdStr]
+        listings.push({
+          ...record.listing,
           status: record.status,
         })
       }
     }
 
-    setNftListings(nftListings)
-    return nftListings
+    setListings(listings)
+    return listings
   }, [chain])
 
   const refreshEthDeposits = useCallback(async (): Promise<void> => {
@@ -118,9 +121,9 @@ export default function useAnonExchange(): AnonExchangeContextType {
   }, [chain])
 
   return {
-    nftListings,
+    listings,
     ethDeposits,
-    refreshNftListing,
+    refreshListing,
     refreshEthDeposits,
   }
 }
