@@ -1,4 +1,3 @@
-import { Simple20 } from './contracts/typechain-types/contracts/Simple20'
 import { defineConfig } from '@wagmi/cli'
 import { actions, hardhat } from '@wagmi/cli/plugins'
 

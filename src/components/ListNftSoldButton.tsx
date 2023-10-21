@@ -1,26 +1,26 @@
 import { Button } from '@chakra-ui/react'
-import { simpleNftABI } from 'abis'
-import { NftListing, NftStatus } from 'context/AnonExchangeContext'
+import { simple721ABI } from 'abis'
+import { Listing, ListingStatus } from 'context/AnonExchangeContext'
 import { Address, useAccount, useContractRead } from 'wagmi'
 
 interface ListNftSoldProps {
-  nft: NftListing
-  updateNftStatus: (nft: NftListing, newStatus: NftStatus) => void
+  listing: Listing
+  updateListingStatus: (listing: Listing, newStatus: ListingStatus) => void
 }
 
-export function ListNftSold({ nft, updateNftStatus }: ListNftSoldProps) {
+export function ListNftSold({ listing, updateListingStatus }: ListNftSoldProps) {
   const { address } = useAccount()
 
   const { data: ownerOfImportNft } = useContractRead({
-    address: nft.contractAddress as Address,
-    abi: simpleNftABI,
+    address: listing.contractAddress as Address,
+    abi: simple721ABI,
     functionName: 'ownerOf',
-    args: [BigInt(nft.tokenId)],
+    args: [BigInt(listing.tokenId || 0)],
     watch: true,
   })
 
   if (ownerOfImportNft === address) {
-    updateNftStatus(nft, 'NotListed')
+    updateListingStatus(listing, 'NotListed')
   }
 
   return <Button disabled={true}>Sold</Button>

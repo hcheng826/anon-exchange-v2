@@ -2,7 +2,7 @@ import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, Addre
 import { Alert, AlertDescription, AlertIcon, AlertTitle, Button, Link, Text, Toast, useToast } from '@chakra-ui/react'
 import { simple20Address, simple20ABI } from 'abis'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { Listing } from 'context/AnonExchangeContext'
+import { Listing, ListingType } from 'context/AnonExchangeContext'
 import { ethers } from 'ethers'
 
 export function MintErc20({ address, chain, setListings }: { address: Address; chain: Chain; setListings: Dispatch<SetStateAction<Listing[]>> }) {
@@ -29,7 +29,7 @@ export function MintErc20({ address, chain, setListings }: { address: Address; c
       setListings((prevListings) => [
         ...prevListings,
         {
-          listingType: 'ERC20',
+          listingType: ListingType.ERC20,
           lister: address,
           amount: Number(amount),
           contractAddress: simple20Address[chain.id as keyof typeof simple20Address],

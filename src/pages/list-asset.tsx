@@ -12,7 +12,7 @@ import { List } from 'components/ListButton'
 import { v4 as uuidv4 } from 'uuid'
 import useAnonExchange from 'hooks/useAnonExchange'
 import { ethers } from 'ethers'
-import { simpleNftABI } from 'abis'
+import { simple721ABI } from 'abis'
 import { supportedChains } from 'utils/config'
 import { MintErc20 } from 'components/MintErc20'
 import { Listings } from 'components/Listings'
@@ -47,7 +47,7 @@ export default function ListPage() {
         if (updatedListing.status === 'Sold') {
           const nftContract = new ethers.Contract(
             updatedListing.contractAddress,
-            simpleNftABI,
+            simple721ABI,
             new ethers.providers.JsonRpcProvider(chain?.rpcUrls.default.http[0])
           )
           return nftContract.ownerOf(updatedListing.tokenId).then((owner: Address) => {

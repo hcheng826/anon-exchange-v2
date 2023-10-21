@@ -2,7 +2,7 @@ import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, Addre
 import { Alert, AlertDescription, AlertIcon, AlertTitle, Button, Link, Text, Toast, useToast } from '@chakra-ui/react'
 import { simple1155Address, simple1155ABI } from 'abis'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { Listing } from 'context/AnonExchangeContext'
+import { Listing, ListingType } from 'context/AnonExchangeContext'
 import { ethers } from 'ethers'
 import { Input, FormControl } from '@chakra-ui/react'
 
@@ -31,7 +31,7 @@ export function MintErc1155({ address, chain, setListings }: { address: Address;
       setListings((prevListings) => [
         ...prevListings,
         {
-          listingType: 'ERC1155',
+          listingType: ListingType.ERC1155,
           lister: address,
           amount: Number(amount),
           tokenId: parseInt(inputId),

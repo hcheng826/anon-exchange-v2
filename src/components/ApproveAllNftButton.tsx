@@ -1,15 +1,15 @@
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, Address, Chain, useContractRead, useAccount } from 'wagmi'
 import { Alert, AlertDescription, AlertIcon, AlertTitle, Button, Link, Text } from '@chakra-ui/react'
-import { anonExchangeAddress, simpleNftABI, simpleNftAddress } from 'abis'
+import { anonExchangeAddress, simple721ABI, simple721Address } from 'abis'
 
 export function ApproveAllNFT({ chain }: { chain: Chain }) {
-  const simpleNftAddr = simpleNftAddress[chain.id as keyof typeof simpleNftAddress]
+  const simpleNftAddr = simple721Address[chain.id as keyof typeof simple721Address]
   const anonExchangeAddr = anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress]
   const { address } = useAccount()
 
   const { data: isApprovedForAll } = useContractRead({
     address: simpleNftAddr,
-    abi: simpleNftABI,
+    abi: simple721ABI,
     functionName: 'isApprovedForAll',
     args: [address || '0x', anonExchangeAddr],
     watch: true,
@@ -17,7 +17,7 @@ export function ApproveAllNFT({ chain }: { chain: Chain }) {
 
   const prepareSetApproveForAll = usePrepareContractWrite({
     address: simpleNftAddr,
-    abi: simpleNftABI,
+    abi: simple721ABI,
     functionName: 'setApprovalForAll',
     args: [anonExchangeAddr, true],
     chainId: chain.id,

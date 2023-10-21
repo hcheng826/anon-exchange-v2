@@ -1,6 +1,6 @@
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, Address, Chain, useContractRead } from 'wagmi'
 import { Alert, AlertDescription, AlertIcon, AlertTitle, Button, Link, Text, Toast, useToast } from '@chakra-ui/react'
-import { simpleNftABI, simple721Address } from 'abis'
+import { simple721ABI, simple721Address } from 'abis'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Listing, ListingType } from 'context/AnonExchangeContext'
 import { ApproveAllNFT } from './ApproveAllNftButton'
@@ -10,14 +10,14 @@ export function MintErc721({ address, chain, setListings }: { address: Address; 
 
   const { refetch: tokenIdRefetch } = useContractRead({
     address: simple721Address[chain?.id as keyof typeof simple721Address],
-    abi: simpleNftABI,
+    abi: simple721ABI,
     functionName: '_tokenIdCounter',
     watch: true,
   })
 
   const prepareSafeMintWrite = usePrepareContractWrite({
     address: simple721Address[chain.id as keyof typeof simple721Address],
-    abi: simpleNftABI,
+    abi: simple721ABI,
     functionName: 'safeMint',
     args: [address],
   })

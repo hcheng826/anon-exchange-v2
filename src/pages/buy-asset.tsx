@@ -43,13 +43,6 @@ export default function BuyNft() {
     setSecret('')
   }
 
-  const chainOptions = [
-    { label: 'Sepolia', value: sepolia },
-    { label: 'Mantle testnet', value: mantleTestnet },
-    { label: 'Scroll sepolia', value: scrollSepolia },
-    { label: 'Polygon zkEVM', value: polygonZkEvm },
-  ]
-
   return (
     <div>
       <NextSeo title="Buy Asset" />

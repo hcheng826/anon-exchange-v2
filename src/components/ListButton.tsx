@@ -1,6 +1,6 @@
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, Address, Chain, useContractRead, useAccount } from 'wagmi'
 import { Button, useToast } from '@chakra-ui/react'
-import { anonExchangeABI, anonExchangeAddress, simple20ABI, simple721ABI, simpleNftAddress } from 'abis'
+import { anonExchangeABI, anonExchangeAddress, simple20ABI, simple721ABI } from 'abis'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Listing, ListingStatus, ListingType } from 'context/AnonExchangeContext'
 import { Identity } from '@semaphore-protocol/identity'

@@ -1,29 +1,29 @@
 import React from 'react'
 import { Button, Table, Thead, Tr, Th, Tbody, Td } from '@chakra-ui/react'
-import { NftListing, NftStatus } from 'context/AnonExchangeContext'
+import { Listing, ListingStatus } from 'context/AnonExchangeContext'
 import { Chain } from 'wagmi'
 import { Identity } from '@semaphore-protocol/identity'
 
 interface Props {
-  nfts?: NftListing[]
+  nfts?: Listing[]
   statusAction?: Record<
-    NftListing['status'],
+    Listing['status'],
     {
       renderButton?: (
-        nft: NftListing,
+        nft: Listing,
         chain: Chain,
         identity?: Identity,
-        updateNftStatus?: (nft: NftListing, newStatus: NftStatus) => void
+        updateListingStatus?: (nft: Listing, newStatus: ListingStatus) => void
       ) => JSX.Element
     }
   >
   chain: Chain
   identity?: Identity
-  updateNftStatus?: (nft: NftListing, newStatus: NftStatus) => void
+  updateListingStatus?: (nft: Listing, newStatus: ListingStatus) => void
 }
 
 export function NftList(props: Props) {
-  const defaultRenderButton = (nft: NftListing) => <Button>{nft.status}</Button>
+  const defaultRenderButton = (nft: Listing) => <Button>{nft.status}</Button>
 
   return (
     <Table variant="simple">
@@ -41,7 +41,7 @@ export function NftList(props: Props) {
             <Tr key={idx}>
               <Td>{nft.contractAddress}</Td>
               <Td>{nft.tokenId}</Td>
-              <Td>{renderButton ? renderButton(nft, props.chain, props.identity, props.updateNftStatus) : defaultRenderButton(nft)}</Td>
+              <Td>{renderButton ? renderButton(nft, props.chain, props.identity, props.updateListingStatus) : defaultRenderButton(nft)}</Td>
             </Tr>
           )
         })}

@@ -115,8 +115,6 @@ contract AnonExchange is IERC721Receiver, IERC1155Receiver {
     trnasferListing(listing, address(this), recipient);
   }
 
-  function claimPayment(address recipient, SemaphoreProof calldata proof) external {}
-
   // call by potential buyer
   function depositETH(uint256 identityCommitment) external payable {
     if (msg.value != LISTING_PRICE) revert InvalidDepositAmount();
