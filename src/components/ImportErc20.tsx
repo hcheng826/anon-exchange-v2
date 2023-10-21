@@ -7,20 +7,24 @@ import { Address, isAddress } from 'viem'
 import { useContractRead } from 'wagmi'
 
 export function ImportErc20({
-  contractAddressInput,
-  setContractAddressInput,
+  contractErc20AddressInput,
+  setContractErc20AddressInput,
+  erc20ImportAmoutInput,
+  setErc20ImportAmoutInput,
   listings,
   setListings,
   address,
 }: {
-  contractAddressInput: string
-  setContractAddressInput: Dispatch<SetStateAction<string>>
+  contractErc20AddressInput: string
+  setContractErc20AddressInput: Dispatch<SetStateAction<string>>
+  erc20ImportAmoutInput: number | null
+  setErc20ImportAmoutInput: Dispatch<SetStateAction<number | null>>
   listings: Listing[]
   setListings: Dispatch<SetStateAction<Listing[]>>
   address: `0x${string}` | undefined
 }) {
   const { data: balance } = useContractRead({
-    address: contractAddressInput as Address,
+    address: contractErc20AddressInput as Address,
     abi: simple20ABI,
     functionName: 'balanceOf',
     args: [address || ethers.constants.AddressZero],
@@ -34,7 +38,7 @@ export function ImportErc20({
   })
 
   const { data: decimals } = useContractRead({
-    address: contractAddressInput as Address,
+    address: contractErc20AddressInput as Address,
     abi: simple20ABI,
     functionName: 'decimals',
     watch: true,
@@ -49,7 +53,7 @@ export function ImportErc20({
   const toast = useToast()
 
   const handleImport = () => {
-    if (!contractAddressInput || !isAddress(contractAddressInput)) {
+    if (!contractErc20AddressInput || !isAddress(contractErc20AddressInput)) {
       toast({
         description: 'Invalid input',
         status: 'error',
@@ -57,33 +61,19 @@ export function ImportErc20({
       return
     }
 
-    // if (
-    //   listings
-    //     .filter((listing) => listing.listingType === ListingType.ERC20)
-    //     .map((listing) => {
-    //       return listing.contractAddress
-    //     })
-    //     .includes(contractAddressInput)
-    // ) {
-    //   toast({
-    //     description: 'Already imported',
-    //   })
-    //   return
-    // }
-
-    if (balance && balance > 0) {
+    if (erc20ImportAmoutInput && balance && decimals && erc20ImportAmoutInput <= balance / BigInt(10 ** decimals)) {
       setListings((prevListings) => [
         ...prevListings,
         {
           listingType: ListingType.ERC20,
-          amount: Number(balance / BigInt(10 ** Number(decimals))),
-          contractAddress: contractAddressInput,
+          amount: erc20ImportAmoutInput,
+          contractAddress: contractErc20AddressInput,
           status: 'NotListed', // default action
         },
       ])
     } else {
       toast({
-        description: 'Not owner of the NFT',
+        description: 'Not enough of balance',
         status: 'error',
       })
     }
@@ -97,7 +87,20 @@ export function ImportErc20({
 
       <Stack spacing={4} mb={4} align="center">
         <InputGroup size="md">
-          <Input placeholder="contract addr: 0x12345...6789" value={contractAddressInput} onChange={(e) => setContractAddressInput(e.target.value)} />
+          <Input
+            placeholder="contract addr: 0x12345...6789"
+            value={contractErc20AddressInput}
+            onChange={(e) => setContractErc20AddressInput(e.target.value)}
+          />
+        </InputGroup>
+
+        <InputGroup size="md">
+          <Input
+            placeholder="Enter Import Amout"
+            type="number"
+            value={erc20ImportAmoutInput ?? ''}
+            onChange={(e) => setErc20ImportAmoutInput(Number(e.target.value))}
+          />
         </InputGroup>
 
         <Button onClick={handleImport} w={'100%'}>

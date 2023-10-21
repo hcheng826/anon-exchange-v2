@@ -2,7 +2,7 @@ import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, Addre
 import { Alert, AlertDescription, AlertIcon, AlertTitle, Button, Link, Text, Toast, useToast } from '@chakra-ui/react'
 import { simpleNftABI, simple721Address } from 'abis'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { Listing } from 'context/AnonExchangeContext'
+import { Listing, ListingType } from 'context/AnonExchangeContext'
 import { ApproveAllNFT } from './ApproveAllNftButton'
 
 export function MintErc721({ address, chain, setListings }: { address: Address; chain: Chain; setListings: Dispatch<SetStateAction<Listing[]>> }) {
@@ -36,7 +36,7 @@ export function MintErc721({ address, chain, setListings }: { address: Address; 
         setListings((prevListings) => [
           ...prevListings,
           {
-            listingType: 'ERC721',
+            listingType: ListingType.ERC721,
             lister: address,
             amount: 1,
             contractAddress: simple721Address[chain.id as keyof typeof simple721Address],

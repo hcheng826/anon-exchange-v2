@@ -1,6 +1,6 @@
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, Address, Chain, useContractRead, useAccount } from 'wagmi'
 import { Button, useToast } from '@chakra-ui/react'
-import { anonExchangeABI, anonExchangeAddress, simple721ABI, simpleNftAddress } from 'abis'
+import { anonExchangeABI, anonExchangeAddress, simple20ABI, simple721ABI, simpleNftAddress } from 'abis'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Listing, ListingStatus, ListingType } from 'context/AnonExchangeContext'
 import { Identity } from '@semaphore-protocol/identity'
@@ -39,6 +39,15 @@ export function List({ listing, chain, identity, updateListingStatus, setSemapho
     watch: true,
   })
 
+  // check erc20 approval
+  const { data: allowance } = useContractRead({
+    address: listing.contractAddress as Address,
+    abi: simple20ABI,
+    functionName: 'allowance',
+    args: [address || '0x', anonExchangeAddr],
+    watch: true,
+  })
+
   const approve721Write = useContractWrite({
     address: listing.contractAddress as Address,
     abi: simple721ABI,
@@ -46,6 +55,14 @@ export function List({ listing, chain, identity, updateListingStatus, setSemapho
     args: [anonExchangeAddr, BigInt(listing.tokenId || 0)],
   })
   const approve721Wait = useWaitForTransaction({ hash: approve721Write.data?.hash })
+
+  const approveErc20Write = useContractWrite({
+    address: listing.contractAddress as Address,
+    abi: simple20ABI,
+    functionName: 'approve',
+    args: [anonExchangeAddr, BigInt(listing.amount || 0)],
+  })
+  const approveErc20Wait = useWaitForTransaction({ hash: approveErc20Write.data?.hash })
 
   const listWrite = useContractWrite({
     address: anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress] as Address,
@@ -68,6 +85,7 @@ export function List({ listing, chain, identity, updateListingStatus, setSemapho
     if (listing.listingType === ListingType.ERC721) {
       approve721Write.write?.()
     } else if (listing.listingType === ListingType.ERC20) {
+      approveErc20Write.write?.()
     } else {
       toast({ status: 'error', description: 'unsupported asset' })
     }
@@ -78,7 +96,10 @@ export function List({ listing, chain, identity, updateListingStatus, setSemapho
   }
 
   useEffect(() => {
+    // ERC721
     setApproved(approvedAddress === anonExchangeAddr || !!isApprovedForAll)
+    // ERC20
+    setApproved((allowance ?? 0) >= listing.amount)
     if (listWait.isSuccess) {
       updateListingStatus(listing, 'Listed')
       setSemaphoreId(undefined)
@@ -102,16 +123,16 @@ export function List({ listing, chain, identity, updateListingStatus, setSemapho
     listing,
     setSemaphoreId,
     updateListingStatus,
-    // refreshSecret,
     isApprovedForAll,
     listWait.data?.transactionHash,
     toast,
     chain?.blockExplorers?.default.url,
+    allowance,
   ])
 
   if (!approved) {
     return (
-      <Button onClick={handleApprove} isLoading={approve721Wait.isLoading}>
+      <Button onClick={handleApprove} isLoading={approve721Wait.isLoading || approveErc20Wait.isLoading}>
         Approve
       </Button>
     )

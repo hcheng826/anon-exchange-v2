@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button, Table, Thead, Tr, Th, Tbody, Td } from '@chakra-ui/react'
-import { Listing, AssetStatus } from 'context/AnonExchangeContext'
+import { Listing, ListingStatus } from 'context/AnonExchangeContext'
 import { Chain } from 'wagmi'
 import { Identity } from '@semaphore-protocol/identity'
 
@@ -13,13 +13,19 @@ interface Props {
         asset: Listing,
         chain: Chain,
         identity?: Identity,
-        updateListingStatus?: (asset: Listing, newStatus: AssetStatus) => void
+        updateListingStatus?: (asset: Listing, newStatus: ListingStatus) => void
       ) => JSX.Element
     }
   >
   chain: Chain
   identity?: Identity
-  updateListingStatus?: (asset: Listing, newStatus: AssetStatus) => void
+  updateListingStatus?: (asset: Listing, newStatus: ListingStatus) => void
+}
+
+const listingTypeDescription = {
+  0: 'ERC20',
+  1: 'ERC721',
+  2: 'ERC1155',
 }
 
 export function Listings(props: Props) {
@@ -41,7 +47,7 @@ export function Listings(props: Props) {
           const renderButton = props.statusAction?.[asset.status]?.renderButton
           return (
             <Tr key={idx}>
-              <Td>{asset.listingType}</Td>
+              <Td>{listingTypeDescription[asset.listingType]}</Td>
               <Td>{asset.contractAddress}</Td>
               <Td>{asset.tokenId}</Td>
               <Td>{asset.amount}</Td>

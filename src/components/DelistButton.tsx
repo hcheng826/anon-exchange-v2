@@ -17,7 +17,7 @@ export function Delist({ listing, chain, updateListingStatus }: DelistProps) {
     address: anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress] as Address,
     abi: anonExchangeABI,
     functionName: 'delist',
-    args: [BigInt(listing.listingIdx)],
+    args: [BigInt(listing.listingIdx || -1)],
     chainId: chain.id,
   })
 

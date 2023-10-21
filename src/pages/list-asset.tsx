@@ -23,8 +23,10 @@ export default function ListPage() {
   const { address, isConnected } = useAccount()
   const { chain } = useNetwork()
 
-  const [contractAddressInput, setContractAddressInput] = useState<string>('')
+  const [contractErc20AddressInput, setContractErc20AddressInput] = useState<string>('')
+  const [contractErc721AddressInput, setContractErc721AddressInput] = useState<string>('')
   const [tokenIdInput, setTokenIdInput] = useState<number | null>(null)
+  const [erc20ImportAmoutInput, setErc20ImportAmoutInput] = useState<number | null>(null)
   const [semaphoreId, setSemaphoreId] = useState<Identity>()
   const [secret, setSecret] = useState(uuidv4())
   const { refreshListing } = useAnonExchange()
@@ -133,8 +135,10 @@ export default function ListPage() {
           <Box flex="1" px="2">
             <ImportErc20
               {...{
-                contractAddressInput,
-                setContractAddressInput,
+                contractErc20AddressInput,
+                setContractErc20AddressInput,
+                erc20ImportAmoutInput,
+                setErc20ImportAmoutInput,
                 listings,
                 setListings,
                 address,
@@ -144,8 +148,8 @@ export default function ListPage() {
           <Box flex="1" px="2">
             <ImportNft
               {...{
-                contractAddressInput,
-                setContractAddressInput,
+                contractErc721AddressInput,
+                setContractErc721AddressInput,
                 tokenIdInput,
                 setTokenIdInput,
                 listings,

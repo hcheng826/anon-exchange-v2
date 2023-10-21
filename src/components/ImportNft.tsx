@@ -6,16 +6,16 @@ import { Address, isAddress } from 'viem'
 import { useContractRead } from 'wagmi'
 
 export function ImportNft({
-  contractAddressInput,
-  setContractAddressInput,
+  contractErc721AddressInput,
+  setContractErc721AddressInput,
   tokenIdInput,
   setTokenIdInput,
   listings,
   setListings,
   address,
 }: {
-  contractAddressInput: string
-  setContractAddressInput: Dispatch<SetStateAction<string>>
+  contractErc721AddressInput: string
+  setContractErc721AddressInput: Dispatch<SetStateAction<string>>
   tokenIdInput: number | null
   setTokenIdInput: Dispatch<SetStateAction<number | null>>
   listings: Listing[]
@@ -23,7 +23,7 @@ export function ImportNft({
   address: `0x${string}` | undefined
 }) {
   const { data: ownerOfImportNft } = useContractRead({
-    address: contractAddressInput as Address,
+    address: contractErc721AddressInput as Address,
     abi: simple721ABI,
     functionName: 'ownerOf',
     args: [BigInt(tokenIdInput || 0)],
@@ -39,7 +39,7 @@ export function ImportNft({
   const toast = useToast()
 
   const handleImport = () => {
-    if (!contractAddressInput || tokenIdInput === null || !isAddress(contractAddressInput)) {
+    if (!contractErc721AddressInput || tokenIdInput === null || !isAddress(contractErc721AddressInput)) {
       toast({
         description: 'Invalid input',
         status: 'error',
@@ -54,7 +54,7 @@ export function ImportNft({
         .map((listing) => {
           return listing.contractAddress
         })
-        .includes(contractAddressInput) &&
+        .includes(contractErc721AddressInput) &&
       listings
         .map((listing) => {
           return listing.tokenId
@@ -74,7 +74,7 @@ export function ImportNft({
         {
           listingType: ListingType.ERC721,
           amount: 1,
-          contractAddress: contractAddressInput,
+          contractAddress: contractErc721AddressInput,
           tokenId: tokenIdInput,
           status: 'NotListed', // default action
         },
@@ -97,7 +97,11 @@ export function ImportNft({
 
       <Stack spacing={4} mb={4} align="center">
         <InputGroup size="md">
-          <Input placeholder="contract addr: 0x12345...6789" value={contractAddressInput} onChange={(e) => setContractAddressInput(e.target.value)} />
+          <Input
+            placeholder="contract addr: 0x12345...6789"
+            value={contractErc721AddressInput}
+            onChange={(e) => setContractErc721AddressInput(e.target.value)}
+          />
         </InputGroup>
 
         <InputGroup size="md">
