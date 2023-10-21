@@ -20,17 +20,17 @@ interface DepositEthProps {
 
 export function DepositETH(props: DepositEthProps) {
   const { chain, semaphoreId, setSemaphoreId, refreshSecret } = props
-  const { data: nftPrice } = useContractRead({
+  const { data: price } = useContractRead({
     address: anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress],
     abi: anonExchangeABI,
-    functionName: 'NFT_PRICE',
+    functionName: 'LISTING_PRICE',
   })
 
   const prepareContractWrite = usePrepareContractWrite({
     address: anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress],
     abi: anonExchangeABI,
     functionName: 'depositETH',
-    value: nftPrice || BigInt(0),
+    value: price || BigInt(0),
     args: [semaphoreId.getCommitment()],
     chainId: chain.id,
   })
