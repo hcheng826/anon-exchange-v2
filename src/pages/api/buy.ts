@@ -53,7 +53,7 @@ export default async function buy(req: NextApiRequest, res: NextApiResponse) {
       proof: fullProof.proof,
     })
 
-    const tx = await anonExchange.buyAndClai(listing.listingIdx, recipient, {
+    const tx = await anonExchange.buyAndClaim(listing.listingIdx, recipient, {
       merkleTreeRoot: fullProof.merkleTreeRoot,
       nullifierHash: fullProof.nullifierHash,
       proof: fullProof.proof,

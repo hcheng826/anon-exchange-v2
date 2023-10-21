@@ -47,9 +47,17 @@ export default async function claimEth(req: NextApiRequest, res: NextApiResponse
   const anonExchange = new ethers.Contract(anonExchangeAddr, anonExchangeABI, relayer)
 
   try {
-    await anonExchange.callStatic.claimETH(recipient, fullProof.merkleTreeRoot, fullProof.nullifierHash, fullProof.proof)
+    await anonExchange.callStatic.claimETH(recipient, {
+      merkleTreeRoot: fullProof.merkleTreeRoot,
+      nullifierHash: fullProof.nullifierHash,
+      proof: fullProof.proof,
+    })
 
-    const tx = await anonExchange.claimETH(recipient, fullProof.merkleTreeRoot, fullProof.nullifierHash, fullProof.proof)
+    const tx = await anonExchange.claimETH(recipient, {
+      merkleTreeRoot: fullProof.merkleTreeRoot,
+      nullifierHash: fullProof.nullifierHash,
+      proof: fullProof.proof,
+    })
     const rc = await tx.wait()
     res.status(200).json({ tx_hash: rc.transactionHash })
     return
