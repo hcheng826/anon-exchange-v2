@@ -14,7 +14,7 @@ import { supportedChains } from 'utils/config'
 export default function DepositEth() {
   const { address, isConnected } = useAccount()
   const { chain } = useNetwork()
-  const { ethDeposits, refreshEthDeposits } = useAnonExchange()
+  const { ethDeposits, refreshEthDeposits } = useAnonExchange(chain)
 
   const [semaphoreId, setSemaphoreId] = useState<Identity>()
   const [secret, setSecret] = useState(uuidv4())

@@ -2,14 +2,13 @@ import { SemaphoreEthers } from '@semaphore-protocol/data'
 import { useCallback, useState } from 'react'
 import { SemaphoreContextType } from '../context/SemaphoreContext'
 import { semaphoreAddress } from 'abis'
-import { ETH_DEPOSITED_GROUP_ID, NFT_SOLD_GROUP_ID, semaphoreStartBlock, chainInUse } from 'utils/config'
+import { ETH_DEPOSITED_GROUP_ID, NFT_SOLD_GROUP_ID, semaphoreStartBlock } from 'utils/config'
 import { Group } from '@semaphore-protocol/group'
+import { Chain } from 'wagmi'
 
-export default function useSemaphore(): SemaphoreContextType {
+export default function useSemaphore(chain: Chain | undefined): SemaphoreContextType {
   const [nftSoldGroup, setNftSoldGroup] = useState<Group>()
   const [ethDepositedGroup, setEthDepositedGroup] = useState<Group>()
-  // need to get eth depositer nonce as well
-  const chain = chainInUse
 
   const refreshGroups = useCallback(async (): Promise<void> => {
     if (!chain || !semaphoreAddress[chain.id as keyof typeof semaphoreAddress]) {

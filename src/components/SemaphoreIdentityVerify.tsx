@@ -4,6 +4,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { FullProof, generateProof, verifyProof } from '@semaphore-protocol/proof'
 import useSemaphore from 'hooks/useSemaphore'
 import { Signal } from 'context/AnonExchangeContext'
+import { Chain } from 'wagmi'
 
 interface Props {
   semaphoreId: Identity | undefined
@@ -12,12 +13,13 @@ interface Props {
   secret: string
   setSecret: Dispatch<SetStateAction<string>>
   signal: Signal
+  chain: Chain
 }
 
 export function SemaphoreIdentityVerify(props: Props) {
-  const { secret, setSecret, signal } = props
+  const { secret, setSecret, signal, chain } = props
   const toast = useToast()
-  const { ethDepositedGroup, nftSoldGroup, refreshGroups } = useSemaphore()
+  const { ethDepositedGroup, nftSoldGroup, refreshGroups } = useSemaphore(chain)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {

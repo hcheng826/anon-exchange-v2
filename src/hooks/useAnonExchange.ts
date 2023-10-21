@@ -2,13 +2,11 @@ import { useCallback, useState } from 'react'
 import { anonExchangeAddress, anonExchangeABI } from 'abis'
 import { AnonExchangeContextType, EthDeposit, Listing, ListingStatus } from 'context/AnonExchangeContext'
 import { ethers } from 'ethers'
-import { chainInUse } from 'utils/config'
-import { sepolia } from 'wagmi'
+import { Chain } from 'viem'
 
-export default function useAnonExchange(): AnonExchangeContextType {
+export default function useAnonExchange(chain: Chain | undefined): AnonExchangeContextType {
   const [listings, setListings] = useState<AnonExchangeContextType['listings']>([])
   const [ethDeposits, setEthDeposits] = useState<AnonExchangeContextType['ethDeposits']>([])
-  const chain = chainInUse
 
   const refreshListing = useCallback(async (): Promise<Listing[]> => {
     if (!chain || !anonExchangeAddress[chain?.id as keyof typeof anonExchangeAddress]) {
@@ -70,7 +68,7 @@ export default function useAnonExchange(): AnonExchangeContextType {
         })
       })
     ).catch((e) => {
-      console.error(e)
+      console.error('error getting events', e)
     })
 
     const listings: Listing[] = []

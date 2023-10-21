@@ -3,16 +3,15 @@ import { Button, useToast } from '@chakra-ui/react'
 import { useState } from 'react'
 import { localhost } from 'viem/chains'
 import { FullProof } from '@semaphore-protocol/proof'
-import { chainInUse } from 'utils/config'
 
 interface BuyNFTProps {
   fullProof: FullProof
   // resetSemaphoreId: () => void
   recipient: string
+  chain: Chain
 }
 
-export function ClaimEthButton({ fullProof /*, resetSemaphoreId*/, recipient }: BuyNFTProps) {
-  const chain: Chain = chainInUse
+export function ClaimEthButton({ fullProof, recipient, chain }: BuyNFTProps) {
   const toast = useToast()
   const [loading, setLoading] = useState(false)
 
@@ -24,6 +23,7 @@ export function ClaimEthButton({ fullProof /*, resetSemaphoreId*/, recipient }: 
       body: JSON.stringify({
         fullProof,
         recipient,
+        chain,
       }),
       headers: {
         'content-type': 'application/json',

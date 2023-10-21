@@ -4,10 +4,9 @@ import { anonExchangeABI, anonExchangeAddress } from 'abis'
 import { decodeError } from 'ethers-decode-error'
 import { localhost } from 'viem/chains'
 import { sepolia } from 'wagmi'
-import { chainInUse } from 'utils/config'
 
-export default async function buyNft(req: NextApiRequest, res: NextApiResponse) {
-  const { nft, fullProof, recipient } = req.body
+export default async function buy(req: NextApiRequest, res: NextApiResponse) {
+  const { listing, fullProof, recipient, chain } = req.body
 
   // Approach 1: OpenZeppelin relayer (tx often stuck: https://forum.openzeppelin.com/t/ethereum-goerli-testnet-relayer-stuck/36929)
 
@@ -25,46 +24,40 @@ export default async function buyNft(req: NextApiRequest, res: NextApiResponse) 
 
   let relayerPk = ''
 
-  if (chainInUse.id === localhost.id) {
+  if (chain.id === localhost.id) {
     if (!process.env.LOCAL_RELAYER_PRIVATE_KEY) {
       res.status(500).json({ message: 'env var not set' })
       return
     }
     relayerPk = process.env.LOCAL_RELAYER_PRIVATE_KEY
-  } else if (chainInUse.id === sepolia.id) {
-    if (!process.env.SEPOLOA_RELAYER_PRIVATE_KEY) {
+  } else if (chain.id === sepolia.id) {
+    if (!process.env.RELAYER_PRIVATE_KEY) {
       res.status(500).json({ message: 'env var not set' })
       return
     }
-    relayerPk = process.env.SEPOLOA_RELAYER_PRIVATE_KEY
+    relayerPk = process.env.RELAYER_PRIVATE_KEY
   } else {
     res.status(500).json({ message: 'unsupported chain' })
     return
   }
 
-  const relayer = new ethers.Wallet(relayerPk, new ethers.providers.JsonRpcProvider(chainInUse.rpcUrls.default.http[0]))
+  const relayer = new ethers.Wallet(relayerPk, new ethers.providers.JsonRpcProvider(chain.rpcUrls.default.http[0]))
 
-  const anonExchangeAddr = anonExchangeAddress[chainInUse.id as keyof typeof anonExchangeAddress]
+  const anonExchangeAddr = anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress]
   const anonExchange = new ethers.Contract(anonExchangeAddr, anonExchangeABI, relayer)
 
   try {
-    await anonExchange.callStatic.buyAndClaimNFT(
-      nft.contractAddress,
-      nft.tokenId,
-      fullProof.merkleTreeRoot,
-      fullProof.nullifierHash,
-      fullProof.proof,
-      recipient
-    )
+    await anonExchange.callStatic.buyAndClaim(listing.listingIdx, recipient, {
+      merkleTreeRoot: fullProof.merkleTreeRoot,
+      nullifierHash: fullProof.nullifierHash,
+      proof: fullProof.proof,
+    })
 
-    const tx = await anonExchange.buyAndClaimNFT(
-      nft.contractAddress,
-      nft.tokenId,
-      fullProof.merkleTreeRoot,
-      fullProof.nullifierHash,
-      fullProof.proof,
-      recipient
-    )
+    const tx = await anonExchange.buyAndClai(listing.listingIdx, recipient, {
+      merkleTreeRoot: fullProof.merkleTreeRoot,
+      nullifierHash: fullProof.nullifierHash,
+      proof: fullProof.proof,
+    })
     const rc = await tx.wait()
     res.status(200).json({ tx_hash: rc.transactionHash })
     return

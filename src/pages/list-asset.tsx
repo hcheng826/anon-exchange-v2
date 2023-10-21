@@ -29,7 +29,7 @@ export default function ListPage() {
   const [erc20ImportAmoutInput, setErc20ImportAmoutInput] = useState<number | null>(null)
   const [semaphoreId, setSemaphoreId] = useState<Identity>()
   const [secret, setSecret] = useState(uuidv4())
-  const { refreshListing } = useAnonExchange()
+  const { refreshListing } = useAnonExchange(chain)
 
   const [listings, setListings] = useState<Listing[]>([])
 

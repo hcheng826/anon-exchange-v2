@@ -1,12 +1,12 @@
 import { Chain, sepolia } from 'wagmi'
 import { Button, useToast } from '@chakra-ui/react'
 import { useState } from 'react'
-import { NftListing } from 'context/AnonExchangeContext'
+import { Listing } from 'context/AnonExchangeContext'
 import { localhost } from 'viem/chains'
 import { FullProof } from '@semaphore-protocol/proof'
 
-interface BuyNFTProps {
-  nft: NftListing
+interface BuyProps {
+  listing: Listing
   chain: Chain
   fullProof: FullProof
   resetSemaphoreId: () => void
@@ -14,19 +14,20 @@ interface BuyNFTProps {
   updateNfts: () => void
 }
 
-export function BuyNFT({ nft, chain, fullProof, resetSemaphoreId, recipient, updateNfts }: BuyNFTProps) {
+export function Buy({ listing, chain, fullProof, resetSemaphoreId, recipient, updateNfts }: BuyProps) {
   const toast = useToast()
   const [loading, setLoading] = useState(false)
 
-  function buyNft() {
+  function buy() {
     setLoading(true)
 
-    fetch('/api/buyNft', {
+    fetch('/api/buy', {
       method: 'POST',
       body: JSON.stringify({
-        nft,
+        listing,
         fullProof,
         recipient,
+        chain,
       }),
       headers: {
         'content-type': 'application/json',
@@ -73,7 +74,7 @@ export function BuyNFT({ nft, chain, fullProof, resetSemaphoreId, recipient, upd
 
   const handleBuyNft = () => {
     if (chain.id === localhost.id || chain.id === sepolia.id) {
-      buyNft()
+      buy()
     } else {
       toast({ description: 'unsupported chain', status: 'error' })
     }
