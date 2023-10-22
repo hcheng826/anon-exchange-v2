@@ -7,7 +7,7 @@ An extension of the previous version of Anonymous NFT Exchange. Added functional
 ## Mantle
 
 Deployed contract: https://explorer.testnet.mantle.xyz/address/0xDD98f5E7269f8eCfb62b77CC8bCbf791BEFF8cC2
-Tweet: https://x.com/lilioo826/status/1716008973281960091?s=20
+Tweet: https://x.com/lilioo826/status/1716009317479161925?s=20
 
 ## Polygon
 
