@@ -16,7 +16,7 @@ task('deploy', 'Deploy Semaphore, AnonExchange and SimpleNFT')
 
     const anonExchangeFactory = await ethers.getContractFactory('AnonExchange')
 
-    const anonExchange = await anonExchangeFactory.deploy(semaphoreAddress)
+    const anonExchange = await anonExchangeFactory.deploy(semaphoreAddress, { gasLimit: 5000000, gasPrice: ethers.utils.parseUnits('5', 'gwei') })
 
     await anonExchange.deployed()
 

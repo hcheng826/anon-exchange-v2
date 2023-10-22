@@ -2,6 +2,11 @@
 
 An extension of the previous version of Anonymous NFT Exchange. Added functionalities to allow listing of ERC20 tokens.
 
+# Sepcial notes for ETH online
+
+Polygon: had some issue deploying to zkEVM testnet, getting error `not enough step counters to continue the execution`. Instructed by polygon teammember to deploy to Mumbai instead: https://discord.com/channels/554623348622098432/819516356616781834/1165545531871870996
+Scroll: the deployment of the contract got stuck: https://sepolia.scrollscan.dev/tx/0x940d964729e7af1c350fea0ea927cf4122a5fd5844db97470eb7101696964095. Tested on fork mode locally is it's working ok.
+
 ## Simplicity Assumption
 
 For the simplicity of the initial system, we make the assets all traded at 0.01 ETH. It is possible to extend to other price tiers in the future.

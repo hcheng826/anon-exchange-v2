@@ -1,12 +1,12 @@
 import { Select } from '@chakra-ui/react'
-import { Chain, mantleTestnet, polygonZkEvm, scrollSepolia, sepolia } from '@wagmi/chains'
+import { Chain, mantleTestnet, polygonMumbai, scrollSepolia, sepolia } from '@wagmi/chains'
 import { Dispatch, SetStateAction, FC } from 'react'
 
 const chainOptions = [
   { label: 'Sepolia', value: sepolia },
   { label: 'Mantle testnet', value: mantleTestnet },
   { label: 'Scroll sepolia', value: scrollSepolia },
-  { label: 'Polygon zkEVM', value: polygonZkEvm },
+  { label: 'Polygon mumbai', value: polygonMumbai },
 ]
 
 interface ChainDropdownProps {
