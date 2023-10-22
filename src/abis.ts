@@ -2758,7 +2758,7 @@ export function writeAnonExchange<
     abi: anonExchangeABI,
     address: anonExchangeAddress[config.chainId as keyof typeof anonExchangeAddress],
     ...config,
-  } as WriteContractArgs<typeof anonExchangeABI, TFunctionName>)
+  } as unknown as WriteContractArgs<typeof anonExchangeABI, TFunctionName>)
 }
 
 /**
@@ -2847,7 +2847,7 @@ export function writeSimple1155<
     abi: simple1155ABI,
     address: simple1155Address[config.chainId as keyof typeof simple1155Address],
     ...config,
-  } as WriteContractArgs<typeof simple1155ABI, TFunctionName>)
+  } as unknown as WriteContractArgs<typeof simple1155ABI, TFunctionName>)
 }
 
 /**
@@ -2928,10 +2928,11 @@ export function writeSimple20<TFunctionName extends string, TMode extends WriteC
         chainId?: TMode extends 'prepared' ? TChainId : keyof typeof simple20Address
       })
 ) {
-  return writeContract({ abi: simple20ABI, address: simple20Address[config.chainId as keyof typeof simple20Address], ...config } as WriteContractArgs<
-    typeof simple20ABI,
-    TFunctionName
-  >)
+  return writeContract({
+    abi: simple20ABI,
+    address: simple20Address[config.chainId as keyof typeof simple20Address],
+    ...config,
+  } as unknown as WriteContractArgs<typeof simple20ABI, TFunctionName>)
 }
 
 /**
@@ -3020,7 +3021,7 @@ export function writeSimple721<
     abi: simple721ABI,
     address: simple721Address[config.chainId as keyof typeof simple721Address],
     ...config,
-  } as WriteContractArgs<typeof simple721ABI, TFunctionName>)
+  } as unknown as WriteContractArgs<typeof simple721ABI, TFunctionName>)
 }
 
 /**
@@ -3141,7 +3142,7 @@ export function writeSemaphore<
     abi: semaphoreABI,
     address: semaphoreAddress[config.chainId as keyof typeof semaphoreAddress],
     ...config,
-  } as WriteContractArgs<typeof semaphoreABI, TFunctionName>)
+  } as unknown as WriteContractArgs<typeof semaphoreABI, TFunctionName>)
 }
 
 /**
