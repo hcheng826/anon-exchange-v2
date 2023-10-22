@@ -66,7 +66,7 @@ export function ImportErc20({
         ...prevListings,
         {
           listingType: ListingType.ERC20,
-          amount: erc20ImportAmoutInput,
+          amount: erc20ImportAmoutInput * 10 ** decimals,
           contractAddress: contractErc20AddressInput,
           status: 'NotListed', // default action
         },

@@ -1,6 +1,6 @@
 import { Button, Text, Heading, Select, list } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
-import { useEffect, useState } from 'react'
+import { SetStateAction, useEffect, useState } from 'react'
 import { RecipientAdressInput } from 'components/layout/RecipientAdressInput'
 import { HeadingComponent } from 'components/layout/HeadingComponent'
 import { Identity } from '@semaphore-protocol/identity'
@@ -15,6 +15,7 @@ import { Chain } from '@wagmi/chains'
 import { ChainDropdown } from 'components/ChainSelectionDropDown'
 import { useContractInfiniteReads } from 'wagmi'
 import { anonExchangeABI, anonExchangeAddress } from 'abis'
+import { ethers } from 'ethers'
 
 export default function BuyAsset() {
   const [recipient, setRecipient] = useState<string>('')
@@ -45,20 +46,58 @@ export default function BuyAsset() {
     setSecret('')
   }
 
-  type ContractConfig = {
-    functionName: string
-    args: any[]
-    address: string
-    abi: any[]
-  }
+  useEffect(() => {
+    if (chain) {
+      const anonExchange = new ethers.Contract(
+        anonExchangeAddress[chain?.id as keyof typeof anonExchangeAddress],
+        anonExchangeABI,
+        new ethers.providers.JsonRpcProvider(chain?.rpcUrls.default.http[0])
+      )
+
+      const listingsFetchedPromies: Promise<Listing>[] = []
+
+      for (let i = 0; i < 50; i++) {
+        const listingPromise = anonExchange.listings(i)
+        listingsFetchedPromies.push(
+          listingPromise
+            .then((listing: any[]) => {
+              return {
+                listingType: listing[0],
+                lister: listing[1],
+                contractAddress: listing[2],
+                tokenId: listing[0] === ListingType.ERC20 ? undefined : Number(listing[3]),
+                amount: Number(listing[4]),
+                listingIdx: i,
+                status: 'Listed',
+              }
+            })
+            .catch(() => {})
+        )
+      }
+
+      Promise.all(listingsFetchedPromies).then((listingsFetched) => {
+        console.log(listingsFetched)
+        console.log(
+          listingsFetched.filter((listing) => {
+            listing && listing.contractAddress !== ethers.constants.AddressZero
+          })
+        )
+        setListings(
+          listingsFetched.filter((listing) => {
+            return listing && listing.contractAddress !== ethers.constants.AddressZero
+          })
+        )
+      })
+    }
+  }, [chain])
 
   const anonExchangeConfig = {
-    address: chain ? anonExchangeAddress[chain.id as keyof typeof anonExchangeAddress] : '0xFFFE3c238718f3a5CfcEDA18AaFFd6203F1FA642',
+    address: anonExchangeAddress[chain?.id as keyof typeof anonExchangeAddress],
     abi: anonExchangeABI,
   }
 
   const { data, fetchNextPage } = useContractInfiniteReads({
-    cacheKey: 'listings1',
+    cacheKey: 'listings',
     contracts(idx = 0) {
       if (!anonExchangeConfig.address) {
         return []
@@ -77,39 +116,8 @@ export default function BuyAsset() {
     cacheTime: 0,
   })
 
-  type FetchedListing = [
-    number, // 0
-    string, // '0xA28B81e10d78a38A9C1D4dD599145355577354f6'
-    string, // '0x816D176a7A925D60099AEd94e9ae953928650fcC'
-    bigint, // 0n
-    bigint, // 1n
-    bigint // 17062994139967014471635386600629574665491413753159562336108775123467628692746n
-  ]
-
   useEffect(() => {
-    return setListings(
-      data?.pages
-        ?.map((page, idx) => {
-          return { data: page[0], idx }
-        })
-        .filter((data) => data.data.status === 'success')
-        .map((listingFetched) => {
-          const listing = listingFetched.data.result as FetchedListing
-          return {
-            listingType: listing[0],
-            lister: listing[1],
-            contractAddress: listing[2],
-            tokenId: listing[0] === ListingType.ERC20 ? undefined : Number(listing[3]),
-            amount: Number(listing[4]),
-            listingIdx: listingFetched.idx,
-            status: 'Listed',
-          }
-        }) || []
-    )
-  }, [data?.pages])
-
-  useEffect(() => {
-    if (data?.pages[data?.pages.length - 1][0].status === 'success') {
+    if (data?.pages[data?.pages.length - 1][0]?.status === 'success') {
       fetchNextPage()
     }
   }, [data?.pages, fetchNextPage])

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button, Table, Thead, Tr, Th, Tbody, Td } from '@chakra-ui/react'
-import { Listing, ListingStatus } from 'context/AnonExchangeContext'
+import { Listing, ListingStatus, ListingType } from 'context/AnonExchangeContext'
 import { Chain } from 'wagmi'
 import { Identity } from '@semaphore-protocol/identity'
 
@@ -50,7 +50,7 @@ export function Listings(props: Props) {
               <Td>{listingTypeDescription[asset.listingType]}</Td>
               <Td>{asset.contractAddress}</Td>
               <Td>{asset.tokenId}</Td>
-              <Td>{asset.amount}</Td>
+              <Td>{asset.listingType == ListingType.ERC20 ? asset.amount / 10 ** 18 : asset.amount}</Td>
               <Td>{renderButton ? renderButton(asset, props.chain, props.identity, props.updateListingStatus) : defaultRenderButton(asset)}</Td>
             </Tr>
           )

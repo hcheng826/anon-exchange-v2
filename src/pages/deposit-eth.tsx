@@ -14,14 +14,14 @@ import { supportedChains } from 'utils/config'
 export default function DepositEth() {
   const { address, isConnected } = useAccount()
   const { chain } = useNetwork()
-  const { ethDeposits, refreshEthDeposits } = useAnonExchange(chain)
+  // const { ethDeposits, refreshEthDeposits } = useAnonExchange(chain)
 
   const [semaphoreId, setSemaphoreId] = useState<Identity>()
   const [secret, setSecret] = useState(uuidv4())
 
-  useEffect(() => {
-    refreshEthDeposits()
-  }, [refreshEthDeposits])
+  // useEffect(() => {
+  //   refreshEthDeposits()
+  // }, [refreshEthDeposits])
 
   function refreshSecret() {
     setSecret(uuidv4())
@@ -39,6 +39,8 @@ export default function DepositEth() {
         <Heading as="h2" fontSize="2xl" my={4}>
           Deposit ETH
         </Heading>
+
+        <p>make sure the wallet is connected to the correct chain and have enough balance</p>
 
         {semaphoreId ? (
           <DepositETH

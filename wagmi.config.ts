@@ -17,7 +17,7 @@ export default defineConfig({
         Semaphore: {
           1337: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
           11155111: '0xDD98f5E7269f8eCfb62b77CC8bCbf791BEFF8cC2',
-          5001: '0xC170Dabb31F278d3024f70c2117a4532D86B9aBc',
+          5001: '0x0BE79aC6873bff6763F930736dfc10498D69cCfe',
         },
         SimpleNFT: {
           1337: '0x0165878A594ca255338adfa4d48449f69242Eb8F',
@@ -41,7 +41,7 @@ export default defineConfig({
         AnonExchange: {
           1337: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
           11155111: '0x18902d3c769aa7F6224CC261606Ded4158C552c1',
-          5001: '0xFFFE3c238718f3a5CfcEDA18AaFFd6203F1FA642',
+          5001: '0xDD98f5E7269f8eCfb62b77CC8bCbf791BEFF8cC2',
         },
       },
     }),
