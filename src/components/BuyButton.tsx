@@ -11,10 +11,9 @@ interface BuyProps {
   fullProof: FullProof
   resetSemaphoreId: () => void
   recipient: string
-  updateNfts: () => void
 }
 
-export function Buy({ listing, chain, fullProof, resetSemaphoreId, recipient, updateNfts }: BuyProps) {
+export function Buy({ listing, chain, fullProof, resetSemaphoreId, recipient }: BuyProps) {
   const toast = useToast()
   const [loading, setLoading] = useState(false)
 
@@ -49,7 +48,6 @@ export function Buy({ listing, chain, fullProof, resetSemaphoreId, recipient, up
                 </>
               ),
             })
-            updateNfts()
             setLoading(false)
           })
           .catch((e) => {
@@ -72,16 +70,16 @@ export function Buy({ listing, chain, fullProof, resetSemaphoreId, recipient, up
     })
   }
 
-  const handleBuyNft = () => {
-    if (chain.id === localhost.id || chain.id === sepolia.id) {
+  const handleBuyAsset = () => {
+    try {
       buy()
-    } else {
-      toast({ description: 'unsupported chain', status: 'error' })
+    } catch (e) {
+      toast({ description: e as string, status: 'error' })
     }
   }
 
   return (
-    <Button onClick={handleBuyNft} isLoading={loading}>
+    <Button onClick={handleBuyAsset} isLoading={loading}>
       Buy
     </Button>
   )

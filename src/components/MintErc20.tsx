@@ -26,16 +26,16 @@ export function MintErc20({ address, chain, setListings }: { address: Address; c
   useEffect(() => {
     if (waitForTransaction.isSuccess) {
       toast({ description: 'Successfully Minted!' })
-      setListings((prevListings) => [
-        ...prevListings,
-        {
-          listingType: ListingType.ERC20,
-          lister: address,
-          amount: Number(amount),
-          contractAddress: simple20Address[chain.id as keyof typeof simple20Address],
-          status: 'NotListed',
-        },
-      ])
+      // setListings((prevListings) => [
+      //   ...prevListings,
+      //   {
+      //     listingType: ListingType.ERC20,
+      //     lister: address,
+      //     amount: Number(amount),
+      //     contractAddress: simple20Address[chain.id as keyof typeof simple20Address],
+      //     status: 'NotListed',
+      //   },
+      // ])
     }
   }, [address, amount, chain.id, setListings, toast, waitForTransaction.isSuccess])
 

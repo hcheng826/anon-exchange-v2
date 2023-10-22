@@ -5,6 +5,7 @@ import '@nomicfoundation/hardhat-toolbox'
 import '@semaphore-protocol/hardhat'
 import '@typechain/hardhat'
 import './tasks/deploy'
+import 'hardhat-contract-sizer'
 
 dotenv.config({ path: join(process.cwd(), '../.env') })
 
@@ -18,7 +19,7 @@ if (!etherscanApiKey) {
 }
 const polygonApiKey = process.env.POLYSCAN_API_KEY ?? ''
 if (!polygonApiKey) {
-  console.warn('POLYSCAN_API_KEY not found in .env file. Will skip Etherscan verification')
+  // console.warn('POLYSCAN_API_KEY not found in .env file. Will skip Etherscan verification')
 }
 
 const config: HardhatUserConfig = {

@@ -30,15 +30,12 @@ export default async function claimEth(req: NextApiRequest, res: NextApiResponse
       return
     }
     relayerPk = process.env.LOCAL_RELAYER_PRIVATE_KEY
-  } else if (chain.id === sepolia.id) {
+  } else {
     if (!process.env.RELAYER_PRIVATE_KEY) {
       res.status(500).json({ message: 'env var not set' })
       return
     }
     relayerPk = process.env.RELAYER_PRIVATE_KEY
-  } else {
-    res.status(500).json({ message: 'unsupported chain' })
-    return
   }
 
   const relayer = new ethers.Wallet(relayerPk, new ethers.providers.JsonRpcProvider(chain.rpcUrls.default.http[0]))

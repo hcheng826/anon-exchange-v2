@@ -102,7 +102,7 @@ export function List({ listing, chain, identity, updateListingStatus, setSemapho
     setApproved((allowance ?? 0) >= listing.amount)
     if (listWait.isSuccess) {
       updateListingStatus(listing, 'Listed')
-      setSemaphoreId(undefined)
+      // setSemaphoreId(undefined)
       toast({
         status: 'success',
         description: (

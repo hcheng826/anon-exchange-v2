@@ -70,10 +70,10 @@ export function ClaimEthButton({ fullProof, recipient, chain }: BuyNFTProps) {
   }
 
   const handleBuyNft = () => {
-    if (chain.id === localhost.id || chain.id === sepolia.id) {
+    try {
       claimEth()
-    } else {
-      toast({ description: 'unsupported chain', status: 'error' })
+    } catch (e) {
+      toast({ description: e as string, status: 'error' })
     }
   }
 

@@ -44,7 +44,7 @@ export function DepositETH(props: DepositEthProps) {
 
   useEffect(() => {
     if (waitForTransaction.isSuccess) {
-      setSemaphoreId(undefined)
+      // setSemaphoreId(undefined)
       // refreshSecret()
     }
   }, [semaphoreId, waitForTransaction.isSuccess, setSemaphoreId, refreshSecret])
